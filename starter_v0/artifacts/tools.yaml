@@ -161,3 +161,39 @@ tools:
         lang: {type: string, enum: [vi, en], default: "vi", description: "Ngôn ngữ Wikipedia. Mặc định vi; dùng en khi user hỏi bằng tiếng Anh hoặc yêu cầu nguồn tiếng Anh."}
         max_results: {type: integer, default: 1, description: "Số bài trả về, từ 1 đến 5. Mặc định 1; chỉ tăng khi user muốn so sánh nhiều bài."}
       required: [query]
+
+  - name: github_repo
+    description: >-
+      Lấy trạng thái hiện tại của MỘT repo GitHub public: số sao, fork, issue đang mở, license, ngôn ngữ, lần push cuối, có bị archive không.
+      DÙNG khi: user hỏi về một repo code cụ thể (vd. "repo LangGraph bao nhiêu sao", "repo này còn được maintain không", "license của repo X"), kể cả khi user dán link github.com của repo.
+      KHÔNG dùng khi: muốn đọc nội dung một trang web/bài viết (→ fetch); tin tức về công ty hay sản phẩm (→ lookup với topic=news); chưa biết repo nào (→ clarify).
+    parameters:
+      type: object
+      properties:
+        repo: {type: string, default: "", description: "Repo dạng 'owner/name' (vd. 'langchain-ai/langgraph'), hoặc chép nguyên link github.com user đưa. Không tự đoán owner nếu user không nói và không chắc."}
+      required: [repo]
+
+  - name: hn_search
+    description: >-
+      Tìm bài thảo luận trên Hacker News (cộng đồng kỹ thuật news.ycombinator.com) theo từ khóa; trả tiêu đề, link, điểm, số bình luận.
+      DÙNG khi: user hỏi Hacker News / HN / dân kỹ thuật trên HN đang bàn gì về một chủ đề.
+      KHÔNG dùng khi: hỏi về Twitter/X (→ social_search hoặc timeline); tin tức báo chí chung (→ lookup với topic=news); paper khoa học (→ papers).
+    parameters:
+      type: object
+      properties:
+        query: {type: string, default: "", description: "Từ khóa chủ đề ngắn, không kèm 'Hacker News' hay từ chỉ thời gian (vd. 'LangGraph')."}
+        sort: {type: string, enum: [relevance, latest], default: "relevance", description: "'latest' khi user muốn bài mới nhất/gần đây; còn lại 'relevance'."}
+        limit: {type: integer, default: 5, description: "Số bài user yêu cầu, từ 1 đến 10; không nói thì để mặc định."}
+      required: [query]
+
+  - name: hf_model
+    description: >-
+      Tra model trên Hugging Face Hub theo tên hoặc id: license, task (pipeline), lượt tải, lượt thích, gated hay không, ngày cập nhật.
+      DÙNG khi: user hỏi thông tin model card của một model AI (vd. "Llama 3.1 8B Instruct có license gì", "model Qwen2.5 dùng cho task gì", "model nào tải nhiều nhất").
+      KHÔNG dùng khi: tìm paper nghiên cứu (→ papers); tin tức về model hay công ty (→ lookup với topic=news); giải thích khái niệm chung (→ wiki).
+    parameters:
+      type: object
+      properties:
+        query: {type: string, default: "", description: "Tên hoặc id model, giữ nguyên cách user viết (vd. 'Llama-3.1-8B-Instruct' hoặc 'Qwen/Qwen2.5-7B-Instruct')."}
+        limit: {type: integer, default: 3, description: "Số model trả về, từ 1 đến 5; không nói thì để mặc định."}
+      required: [query]

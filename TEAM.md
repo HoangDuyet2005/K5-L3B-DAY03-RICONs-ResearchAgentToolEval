@@ -84,6 +84,8 @@ Mỗi thành viên có báo cáo riêng trong `report/team/` theo dạng `MSSV_H
 - Run base `v3-wiki` (0.95, không regression so với v3) và dòng `v3-wiki` trong `version_log.csv`.
 - UI Streamlit `starter_v0/app.py` (hiện mọi tool call và lỗi, ghi transcript); sửa lỗi lịch sử hội thoại làm agent không bao giờ gửi được Telegram sau khi user xác nhận.
 - Bonus: gửi Telegram thật sau xác nhận (transcript T3 ở B4).
+- Bonus: thêm 3 tool tự viết `github_repo`, `hn_search`, `hf_model` (đủ 4 tool của nhóm), mỗi tool có `TOOL.md`, test và eval case route tới (`data/eval_bonus_tools.json`, 7/7); run `v4-tools` không regression.
+- Bonus test challenge: điền cả 14 stub test của starter (`pytest` 0 skipped), tìm 2 bug trong tool `format` có sẵn, sửa và thêm regression test.
 - `.gitattributes` giữ artifact ở LF để `prompt_hash`/`tools_hash` giống nhau trên mọi máy.
 - Báo cáo nhóm: Phần A, B3, B4, B5a, dòng Telegram ở B5, mục 3, mục 5, mục 8.
 

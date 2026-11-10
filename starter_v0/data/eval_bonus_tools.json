@@ -1,0 +1,81 @@
+{
+  "dataset_id": "day03_v2_research_bonus_tools",
+  "dataset_role": "group",
+  "description": "Case bonus của nhóm RICONs: kiểm tra model route đúng tới 3 tool tự viết thêm (github_repo, hn_search, hf_model) và không nhầm với tool có sẵn gần nghĩa (fetch, social_search, papers). Tách riêng khỏi eval_group.json vì bộ đó phải đúng 10 case.",
+  "allowed_failure_types": ["wrong_tool", "wrong_arg_value", "wrong_boundary", "unnecessary_tool", "out_of_scope", "missing_info"],
+  "cases": [
+    {
+      "id": "X01_github_repo_routing",
+      "phase": "B",
+      "suite": "group",
+      "query": "Repo langchain-ai/langgraph hiện có bao nhiêu sao, còn được maintain không?",
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [{"name": "github_repo", "args": {"repo": "langchain-ai/langgraph"}}]},
+      "metadata": {"skill": "routing_repo_state", "difficulty": "easy",
+                   "what_it_tests": "Hỏi trạng thái một repo (sao, còn maintain) → github_repo với repo dạng owner/name."}
+    },
+    {
+      "id": "X02_github_link_not_fetch",
+      "phase": "B",
+      "suite": "group",
+      "query": "Repo này còn active không: https://github.com/microsoft/autogen",
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [{"name": "github_repo", "args": {}}]},
+      "metadata": {"skill": "boundary_github_repo_vs_fetch", "difficulty": "medium",
+                   "what_it_tests": "User dán link github.com nhưng hỏi trạng thái repo, không hỏi nội dung trang → github_repo, không fetch."}
+    },
+    {
+      "id": "X03_hn_routing",
+      "phase": "B",
+      "suite": "group",
+      "query": "Dân trên Hacker News đang bàn gì về Rust?",
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [{"name": "hn_search", "args": {"query": "Rust"}}]},
+      "metadata": {"skill": "routing_hacker_news", "difficulty": "easy",
+                   "what_it_tests": "Nhắc rõ Hacker News → hn_search, query là từ khóa gọn, không phải social_search."}
+    },
+    {
+      "id": "X04_hn_latest_limit_args",
+      "phase": "B",
+      "suite": "group",
+      "query": "Cho mình 3 bài mới nhất trên HN về LangGraph",
+      "failure_type": "wrong_arg_value",
+      "expect": {"tool_calls": [{"name": "hn_search", "args": {"sort": "latest", "limit": 3}}]},
+      "metadata": {"skill": "hn_sort_limit_args", "difficulty": "medium",
+                   "what_it_tests": "'mới nhất' → sort=latest, '3 bài' → limit=3; HN viết tắt vẫn phải nhận ra."}
+    },
+    {
+      "id": "X05_twitter_not_hn",
+      "phase": "B",
+      "suite": "group",
+      "query": "Trên Twitter mọi người đang nói gì về Rust?",
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [{"name": "social_search", "args": {}}]},
+      "metadata": {"skill": "boundary_social_search_vs_hn", "difficulty": "medium",
+                   "what_it_tests": "Cùng chủ đề với X03 nhưng hỏi Twitter → social_search, không gọi hn_search."}
+    },
+    {
+      "id": "X06_hf_license_routing",
+      "phase": "B",
+      "suite": "group",
+      "query": "Model Llama-3.1-8B-Instruct có license gì?",
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [{"name": "hf_model", "args": {}}]},
+      "metadata": {"skill": "routing_model_card", "difficulty": "easy",
+                   "what_it_tests": "Hỏi license của một model → hf_model, không lookup hay papers."}
+    },
+    {
+      "id": "X07_hf_not_papers_multiturn",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {"role": "user", "content": "Mình đang so sánh các model Qwen2.5"},
+        {"role": "user", "content": "Không cần paper đâu, chỉ cần biết model Qwen/Qwen2.5-7B-Instruct dùng cho task gì và license gì"}
+      ],
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [{"name": "hf_model", "args": {"query": "Qwen/Qwen2.5-7B-Instruct"}}]},
+      "metadata": {"skill": "boundary_hf_model_vs_papers", "difficulty": "medium",
+                   "what_it_tests": "Chủ đề model nhưng user từ chối paper và hỏi thông tin model card → hf_model với đúng id user viết, không papers."}
+    }
+  ]
+}

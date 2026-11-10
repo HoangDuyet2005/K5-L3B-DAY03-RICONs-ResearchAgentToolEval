@@ -18,6 +18,9 @@ from .social_search.tool import search_tweets
 from .send.tool import send_telegram
 from .lookup.tool import web_search
 from .wiki.tool import wiki_search
+from .github_repo.tool import github_repo_info
+from .hn_search.tool import search_hacker_news
+from .hf_model.tool import search_hf_models
 
 
 # NOTE (starter_v0): tool names here are intentionally vague. These keys are the
@@ -38,6 +41,9 @@ TOOL_FUNCTIONS = {
     "paper_text": get_arxiv_paper_text,
     # New tools added by team RICONs (declared at the end of artifacts/tools.yaml).
     "wiki": wiki_search,
+    "github_repo": github_repo_info,
+    "hn_search": search_hacker_news,
+    "hf_model": search_hf_models,
 }
 
 

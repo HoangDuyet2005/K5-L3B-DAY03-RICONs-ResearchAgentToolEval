@@ -1,0 +1,596 @@
+{
+  "run_id": "v4-tools_B_extension_openrouter_20261110T210431359888",
+  "version": "v4-tools",
+  "artifact_version": "v4-tools+p8f5c6f233078+t842391e78527",
+  "prompt_hash": "8f5c6f23307896221657474715ceab57e808228dbc4ee3b1dce3671ee32af149",
+  "tools_hash": "842391e785279a646791e44dbc6d31d5d8a43ba0a843bb7c00fdec3511336cd9",
+  "phase": "B",
+  "suite": "extension",
+  "provider": "openrouter",
+  "model": "anthropic/claude-haiku-5.5",
+  "system_prompt": "D:\\Code\\TheDLC\\AI20K\\labs\\K5-L3B-DAY03-RICONs-ResearchAgentToolEval\\starter_v0\\artifacts\\system_prompt.md",
+  "tools": "D:\\Code\\TheDLC\\AI20K\\labs\\K5-L3B-DAY03-RICONs-ResearchAgentToolEval\\starter_v0\\artifacts\\tools.yaml",
+  "eval_cases": "data\\eval_bonus_tools.json",
+  "dataset_id": "day03_v2_research_bonus_tools",
+  "dataset_role": "group",
+  "description": "Case bonus của nhóm RICONs: kiểm tra model route đúng tới 3 tool tự viết thêm (github_repo, hn_search, hf_model) và không nhầm với tool có sẵn gần nghĩa (fetch, social_search, papers). Tách riêng khỏi eval_group.json vì bộ đó phải đúng 10 case.",
+  "generated_at": "2026-11-10T21:04:31",
+  "summary": {
+    "total_cases": 7,
+    "measured_cases": 7,
+    "provider_error_cases": 0,
+    "passed_cases": 7,
+    "case_accuracy": 1.0,
+    "tool_routing_accuracy": 1.0,
+    "argument_accuracy": 1.0,
+    "multiturn_accuracy": 1.0,
+    "failure_counts": {},
+    "observed_mismatch_counts": {}
+  },
+  "results": [
+    {
+      "id": "X01_github_repo_routing",
+      "phase": "B",
+      "suite": "extension",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "routing_repo_state",
+        "difficulty": "easy",
+        "what_it_tests": "Hỏi trạng thái một repo (sao, còn maintain) → github_repo với repo dạng owner/name."
+      },
+      "input": "Repo langchain-ai/langgraph hiện có bao nhiêu sao, còn được maintain không?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "github_repo",
+            "args": {
+              "repo": "langchain-ai/langgraph"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "github_repo",
+            "args": {
+              "repo": "langchain-ai/langgraph"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "github_repo",
+          "args": {
+            "repo": "langchain-ai/langgraph"
+          },
+          "result": {
+            "tool": "github_repo_info",
+            "repo": "langchain-ai/langgraph",
+            "stars": 44751,
+            "forks": 7711,
+            "open_issues": 480,
+            "license": "MIT",
+            "language": "Python",
+            "last_push": "2026-11-10T05:42:48Z",
+            "archived": false,
+            "items": [
+              {
+                "title": "langchain-ai/langgraph",
+                "url": "https://github.com/langchain-ai/langgraph",
+                "source": "github.com",
+                "summary": "Build resilient agents. | stars 44751, forks 7711, open issues 480, license MIT, last push 2026-11-10T05:42:48Z"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "X02_github_link_not_fetch",
+      "phase": "B",
+      "suite": "extension",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "boundary_github_repo_vs_fetch",
+        "difficulty": "medium",
+        "what_it_tests": "User dán link github.com nhưng hỏi trạng thái repo, không hỏi nội dung trang → github_repo, không fetch."
+      },
+      "input": "Repo này còn active không: https://github.com/microsoft/autogen",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "github_repo",
+            "args": {}
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "github_repo",
+            "args": {
+              "repo": "https://github.com/microsoft/autogen"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "github_repo",
+          "args": {
+            "repo": "https://github.com/microsoft/autogen"
+          },
+          "result": {
+            "tool": "github_repo_info",
+            "repo": "microsoft/autogen",
+            "stars": 61773,
+            "forks": 9390,
+            "open_issues": 1173,
+            "license": "CC-BY-4.0",
+            "language": "Python",
+            "last_push": "2026-10-28T14:45:27Z",
+            "archived": false,
+            "items": [
+              {
+                "title": "microsoft/autogen",
+                "url": "https://github.com/microsoft/autogen",
+                "source": "github.com",
+                "summary": "A programming framework for agentic AI | stars 61773, forks 9390, open issues 1173, license CC-BY-4.0, last push 2026-10-28T14:45:27Z"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "X03_hn_routing",
+      "phase": "B",
+      "suite": "extension",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "routing_hacker_news",
+        "difficulty": "easy",
+        "what_it_tests": "Nhắc rõ Hacker News → hn_search, query là từ khóa gọn, không phải social_search."
+      },
+      "input": "Dân trên Hacker News đang bàn gì về Rust?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "hn_search",
+            "args": {
+              "query": "Rust"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "hn_search",
+            "args": {
+              "query": "Rust"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "hn_search",
+          "args": {
+            "query": "Rust"
+          },
+          "result": {
+            "tool": "search_hacker_news",
+            "query": "Rust",
+            "sort": "relevance",
+            "items": [
+              {
+                "title": "Why Discord is switching from Go to Rust",
+                "url": "https://blog.discordapp.com/why-discord-is-switching-from-go-to-rust-a190bbca2b1f",
+                "source": "blog.discordapp.com",
+                "summary": "1582 points, 642 comments, 2020-02-04; HN discussion: https://news.ycombinator.com/item?id=22238335"
+              },
+              {
+                "title": "Leaving Rust gamedev after 3 years",
+                "url": "https://loglog.games/blog/leaving-rust-gamedev/",
+                "source": "loglog.games",
+                "summary": "1484 points, 972 comments, 2024-04-26; HN discussion: https://news.ycombinator.com/item?id=40172033"
+              },
+              {
+                "title": "A half-hour to learn Rust",
+                "url": "https://fasterthanli.me/articles/a-half-hour-to-learn-rust",
+                "source": "fasterthanli.me",
+                "summary": "1444 points, 330 comments, 2021-01-02; HN discussion: https://news.ycombinator.com/item?id=25610741"
+              },
+              {
+                "title": "Announcing Rust 1.0",
+                "url": "http://blog.rust-lang.org/2015/05/15/Rust-1.0.html",
+                "source": "blog.rust-lang.org",
+                "summary": "1363 points, 306 comments, 2015-05-15; HN discussion: https://news.ycombinator.com/item?id=9551937"
+              },
+              {
+                "title": "CityBound – An open source city simulation game in Rust",
+                "url": "https://github.com/citybound/citybound",
+                "source": "github.com",
+                "summary": "1340 points, 264 comments, 2019-04-05; HN discussion: https://news.ycombinator.com/item?id=19583384"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "X04_hn_latest_limit_args",
+      "phase": "B",
+      "suite": "extension",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "hn_sort_limit_args",
+        "difficulty": "medium",
+        "what_it_tests": "'mới nhất' → sort=latest, '3 bài' → limit=3; HN viết tắt vẫn phải nhận ra."
+      },
+      "input": "Cho mình 3 bài mới nhất trên HN về LangGraph",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "hn_search",
+            "args": {
+              "sort": "latest",
+              "limit": 3
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "hn_search",
+            "args": {
+              "query": "LangGraph",
+              "limit": 3,
+              "sort": "latest"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "hn_search",
+          "args": {
+            "query": "LangGraph",
+            "limit": 3,
+            "sort": "latest"
+          },
+          "result": {
+            "tool": "search_hacker_news",
+            "query": "LangGraph",
+            "sort": "latest",
+            "items": [
+              {
+                "title": "How to Add an Audit Trail to a LangGraph Agent",
+                "url": "https://medium.com/@MirArshadTalpur/how-to-add-an-audit-trail-to-a-langgraph-agent-ba2401af4902",
+                "source": "medium.com",
+                "summary": "2 points, 0 comments, 2026-11-02; HN discussion: https://news.ycombinator.com/item?id=50336586"
+              },
+              {
+                "title": "Show HN: Wavefunction – a minimal, open-source desktop coding agent for Mac",
+                "url": "https://www.wavefunction.si/",
+                "source": "wavefunction.si",
+                "summary": "2 points, 0 comments, 2026-10-29; HN discussion: https://news.ycombinator.com/item?id=50290892"
+              },
+              {
+                "title": "Ask HN: Do u think there should be a auto recovery tool for agents?",
+                "url": "https://news.ycombinator.com/item?id=50266077",
+                "source": "news.ycombinator.com",
+                "summary": "1 points, 0 comments, 2026-10-27; HN discussion: https://news.ycombinator.com/item?id=50266077"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "X05_twitter_not_hn",
+      "phase": "B",
+      "suite": "extension",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "boundary_social_search_vs_hn",
+        "difficulty": "medium",
+        "what_it_tests": "Cùng chủ đề với X03 nhưng hỏi Twitter → social_search, không gọi hn_search."
+      },
+      "input": "Trên Twitter mọi người đang nói gì về Rust?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "social_search",
+            "args": {}
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "query": "Rust"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "social_search",
+          "args": {
+            "query": "Rust"
+          },
+          "result": {
+            "tool": "search_tweets",
+            "query": "Rust",
+            "search_type": "Latest",
+            "items": [
+              {
+                "title": "最近になって皆さんに教えていただいたのですが、野良のケアパケたまにあるそうです。普通はサプライシグナル投げた人しか見れないそうです",
+                "summary": "最近になって皆さんに教えていただいたのですが、野良のケアパケたまにあるそうです。普通はサプライシグナル投げた人しか見れないそうです\n#RUST　#RUST日記　#少し覚えた野良ケアパケ",
+                "url": "https://x.com/KuroNekoM66/status/2120155663846584417",
+                "source": "@KuroNekoM66",
+                "date": "Tue Nov 10 14:04:35 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": null
+                }
+              },
+              {
+                "title": "@ajit80831 Wow this is amazing rust removal technique",
+                "summary": "@ajit80831 Wow this is amazing rust removal technique",
+                "url": "https://x.com/sam2_02/status/2120155635941507194",
+                "source": "@sam2_02",
+                "date": "Tue Nov 10 14:04:28 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": null
+                }
+              },
+              {
+                "title": "today i learned safe rust can still hit UB (Undefined Behavior) through std itself.",
+                "summary": "today i learned safe rust can still hit UB (Undefined Behavior) through std itself.\n\nmicrosoft's FORGE lab found process::exit from a child thread unmaps the main thread's signal stack. sat in std for ~11 years.\n\nnow rechecking how my jsrt (a js runtime i'm building) workers shut down",
+                "url": "https://x.com/404humandev/status/2120155559491981623",
+                "source": "@404humandev",
+                "date": "Tue Nov 10 14:04:10 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": "1"
+                }
+              },
+              {
+                "title": "@biondorama @Mcbeath_on_sea Idk man I could definitely take her in a 1v1 on rust",
+                "summary": "@biondorama @Mcbeath_on_sea Idk man I could definitely take her in a 1v1 on rust",
+                "url": "https://x.com/merepiff/status/2120155538449109011",
+                "source": "@merepiff",
+                "date": "Tue Nov 10 14:04:05 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": null
+                }
+              },
+              {
+                "title": "@alwaysnonsense2 Rust or Ruby to pahli baar suun rhi mei",
+                "summary": "@alwaysnonsense2 Rust or Ruby to pahli baar suun rhi mei",
+                "url": "https://x.com/shreyasinghyoo/status/2120155043936505871",
+                "source": "@shreyasinghyoo",
+                "date": "Tue Nov 10 14:02:07 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": "5"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "X06_hf_license_routing",
+      "phase": "B",
+      "suite": "extension",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "routing_model_card",
+        "difficulty": "easy",
+        "what_it_tests": "Hỏi license của một model → hf_model, không lookup hay papers."
+      },
+      "input": "Model Llama-3.1-8B-Instruct có license gì?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "hf_model",
+            "args": {}
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "hf_model",
+            "args": {
+              "query": "Llama-3.1-8B-Instruct"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "hf_model",
+          "args": {
+            "query": "Llama-3.1-8B-Instruct"
+          },
+          "result": {
+            "tool": "search_hf_models",
+            "query": "Llama-3.1-8B-Instruct",
+            "items": [
+              {
+                "title": "meta-llama/Llama-3.1-8B-Instruct",
+                "url": "https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct",
+                "source": "huggingface.co",
+                "summary": "task text-generation, license llama3.1, downloads 4535750, likes 8872, gated manual, last modified 2024-09-25",
+                "license": "llama3.1",
+                "downloads": 4535750
+              },
+              {
+                "title": "bartowski/Meta-Llama-3.1-8B-Instruct-GGUF",
+                "url": "https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF",
+                "source": "huggingface.co",
+                "summary": "task text-generation, license llama3.1, downloads 331997, likes 433, gated False, last modified 2024-12-01",
+                "license": "llama3.1",
+                "downloads": 331997
+              },
+              {
+                "title": "hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4",
+                "url": "https://huggingface.co/hugging-quants/Meta-Llama-3.1-8B-Instruct-AWQ-INT4",
+                "source": "huggingface.co",
+                "summary": "task text-generation, license llama3.1, downloads 321356, likes 95, gated False, last modified 2024-08-07",
+                "license": "llama3.1",
+                "downloads": 321356
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "X07_hf_not_papers_multiturn",
+      "phase": "B",
+      "suite": "extension",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "boundary_hf_model_vs_papers",
+        "difficulty": "medium",
+        "what_it_tests": "Chủ đề model nhưng user từ chối paper và hỏi thông tin model card → hf_model với đúng id user viết, không papers."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Mình đang so sánh các model Qwen2.5"
+        },
+        {
+          "role": "user",
+          "content": "Không cần paper đâu, chỉ cần biết model Qwen/Qwen2.5-7B-Instruct dùng cho task gì và license gì"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "hf_model",
+            "args": {
+              "query": "Qwen/Qwen2.5-7B-Instruct"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "hf_model",
+            "args": {
+              "query": "Qwen/Qwen2.5-7B-Instruct",
+              "limit": 1
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "hf_model",
+          "args": {
+            "query": "Qwen/Qwen2.5-7B-Instruct",
+            "limit": 1
+          },
+          "result": {
+            "tool": "search_hf_models",
+            "query": "Qwen/Qwen2.5-7B-Instruct",
+            "items": [
+              {
+                "title": "Qwen/Qwen2.5-7B-Instruct",
+                "url": "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct",
+                "source": "huggingface.co",
+                "summary": "task text-generation, license apache-2.0, downloads 6075622, likes 2489, gated False, last modified 2025-01-12",
+                "license": "apache-2.0",
+                "downloads": 6075622
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
