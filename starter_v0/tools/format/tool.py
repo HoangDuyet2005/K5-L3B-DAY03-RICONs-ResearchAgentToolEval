@@ -15,11 +15,15 @@ def _bullet(item: dict[str, Any]) -> str:
     text = (item.get("summary") or item.get("title") or "").strip().replace("\n", " ")
     if len(text) > 280:
         text = text[:277] + "..."
-    return f"- {text} - {_src(item)}"
+    src = _src(item)
+    # Regression fix (team RICONs): no dangling " - " when an item has no url/source.
+    return f"- {text} - {src}" if src else f"- {text}"
 
 
 def render_digest(items: list[dict[str, Any]] | None = None, template: str = "sections", headline: str = "") -> dict[str, Any]:
-    items = items or []
+    # Regression fix (team RICONs): models sometimes pass plain strings as items;
+    # treat them as titles instead of raising AttributeError on item.get(...).
+    items = [item if isinstance(item, dict) else {"title": str(item)} for item in (items or []) if item is not None]
     if template == "brief":
         markdown = (f"**{headline}**\n\n" if headline else "") + "\n".join(_bullet(item) for item in items[:5])
     elif template == "bullets":

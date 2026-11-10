@@ -38,6 +38,10 @@
 - Live chat: agent hỏi lại khi thiếu tài khoản (T2), xin xác nhận yes/no trước khi đăng Telegram và chỉ gửi sau khi user đồng ý (T3).
   Khi test live, mình phát hiện agent không bao giờ gửi được Telegram dù user xác nhận nhiều lần: lịch sử hội thoại của `chat.py` bỏ hết kết quả tool, nên ở lượt sau model nghĩ bản tin của chính nó không có nguồn.
   Mình sửa trong UI bằng cách lưu kèm bằng chứng tool vào lịch sử (chi tiết ở mục 5 báo cáo nhóm).
+- Bonus (mục B5 báo cáo nhóm):
+  - Thêm 3 tool `github_repo`, `hn_search`, `hf_model` (đủ 4 tool tự viết), 13 unit test, 7 eval case trong `data/eval_bonus_tools.json` (7/7), run `v4-tools` base 19/20 bằng v3.
+  - Điền cả 14 stub test của starter, `pytest` 118 passed, 0 skipped; tìm và sửa 2 bug trong tool `format` có sẵn (raise khi `items` là chuỗi, dư dấu gạch nối khi item không có link), mỗi bug một regression test.
+  - Test của chính mình cũng bắt được một lỗi: `hn_search(limit=0)` trả 5 kết quả thay vì 1, vì `int(limit or 5)` coi 0 là không truyền.
 
 ## 4. Bằng chứng
 

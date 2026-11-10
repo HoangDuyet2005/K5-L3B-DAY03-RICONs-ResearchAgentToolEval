@@ -53,6 +53,9 @@ URL:
 | papers | Tìm paper trên arXiv | không |
 | paper_text | Tải PDF arXiv và trích text | không |
 | wiki | Tra Wikipedia (`vi`/`en`): định nghĩa, tiểu sử, lịch sử; không cần API key | **có** |
+| github_repo | Trạng thái một repo GitHub: sao, fork, issue, license, lần push cuối, có bị archive không | **có** |
+| hn_search | Tìm bài thảo luận trên Hacker News theo từ khóa (`relevance` hoặc `latest`) | **có** |
+| hf_model | Tra model trên Hugging Face Hub: license, task, lượt tải | **có** |
 
 ### A3. Câu hỏi mẫu để thử
 
@@ -82,6 +85,13 @@ URL:
 - Tra Wikipedia (`vi`/`en`) và trả đoạn mở đầu của bài khớp nhất kèm link; không cần API key.
 - Agent nên gọi khi user hỏi định nghĩa ("X là gì"), tiểu sử ("X là ai") hoặc lịch sử một tổ chức/công nghệ; không gọi cho tin mới (→ `lookup` với `topic=news`), tweet (→ `timeline`/`social_search`) hay khi đã có URL (→ `fetch`).
 - Khai báo ở cuối `tools.yaml` (mục "Group tools"), ghi riêng thành version `v3-wiki` trong `version_log.csv`.
+
+**Tool bonus `github_repo`, `hn_search`, `hf_model` (version `v4-tools`):**
+
+- `github_repo`: trạng thái một repo GitHub (sao, license, lần push cuối); gọi khi user hỏi về một repo code cụ thể, kể cả khi dán link github.com; không dùng `fetch` cho câu hỏi kiểu này.
+- `hn_search`: bài thảo luận trên Hacker News; gọi khi user nhắc Hacker News/HN; câu hỏi về Twitter/X vẫn là `social_search`.
+- `hf_model`: thông tin model card trên Hugging Face (license, task, lượt tải); gọi khi user hỏi về một model AI cụ thể; paper vẫn là `papers`.
+- Cả 3 không cần API key, mỗi tool một request, trả `items` cùng dạng với `lookup`, input xấu và lỗi HTTP đều trả error dict.
 
 Chi tiết từng version và số đo ở B1; failure analysis ở B2.
 
@@ -196,11 +206,21 @@ Chỉ điền nếu nhóm làm bonus (ghi riêng, tối đa 10 điểm). Tool c�
 | Bonus | Evidence File | What Worked | Risk / Guardrail |
 |---|---|---|---|
 | Small Local Model | xem B7 |  |  |
-| Hơn 3 tool mới (≥ 4) |  |  |  |
+| Hơn 3 tool mới (≥ 4) | 4 tool tự viết: [`wiki`](../../starter_v0/tools/wiki/), [`github_repo`](../../starter_v0/tools/github_repo/), [`hn_search`](../../starter_v0/tools/hn_search/), [`hf_model`](../../starter_v0/tools/hf_model/), mỗi tool có `TOOL.md`, đăng ký trong [`tools/__init__.py`](../../starter_v0/tools/__init__.py) và [`tools.yaml`](../../starter_v0/artifacts/tools.yaml); test trong [`tests/test_tools_todo.py`](../../starter_v0/tests/test_tools_todo.py) (`wiki` 7, `github_repo` 5, `hn_search` 4, `hf_model` 4); eval route tới tool mới: 6 case `wiki` trong `eval_group.json` và 7 case trong [`data/eval_bonus_tools.json`](../../starter_v0/data/eval_bonus_tools.json) | Run `v4-tools` (Haiku 5.5, `v4-tools+p8f5c6f233078+t842391e78527`): bộ bonus 7/7 ([`v4-tools_B_extension_…210431359888.json`](../../starter_v0/runs/v4-tools_B_extension_openrouter_20261110T210431359888.json)), group 10/10 ([`v4-tools_B_group_…210448619193.json`](../../starter_v0/runs/v4-tools_B_group_openrouter_20261110T210448619193.json)), base 19/20 bằng v3 ([`v4-tools_B_base_…210630372660.json`](../../starter_v0/runs/v4-tools_B_base_openrouter_20261110T210630372660.json)), dòng `v4-tools` trong `version_log.csv`. Mỗi tool được gọi với dữ liệu thật, không lỗi | 3 case biên kiểm tra không nhầm với tool sẵn có: link github.com → `github_repo` không `fetch` (X02), Twitter → `social_search` không `hn_search` (X05), "không cần paper" → `hf_model` không `papers` (X07). Cả 4 tool chỉ đọc, không side effect |
 | `send` gửi thật lên Telegram sau xác nhận | T3 ở B4: [`ui_streamlit_openrouter_20261110T193835828410.transcript.json`](../../starter_v0/transcripts/ui_streamlit_openrouter_20261110T193835828410.transcript.json) | Luồng đầy đủ: agent soạn bản tin rồi `clarify(yes_no)` → user xác nhận → `send(confirmed=true)` → `status: sent` trên private channel của nhóm | Tool `send` tự chặn khi `confirmed` khác `true` (trả `needs_confirmation`, không gọi mạng); token và chat id chỉ nằm trong `.env`, không có trong transcript |
-| Test challenge (0 skipped / regression test) | `pytest` output |  |  |
+| Test challenge (0 skipped / regression test) | `pytest` output: `118 passed` (0 failed, **0 skipped**); [`tests/test_tools_todo.py`](../../starter_v0/tests/test_tools_todo.py) | Cả 14 stub của starter (clarify, format, send, lookup, fetch, timeline, social_search, policy) đã thành test thật, chạy offline qua `fake_http`; thêm 2 regression test cho 2 bug tìm được trong `format` (bên dưới) | Mỗi test assert cả request gửi đi lẫn kết quả trả về; test `policy` kiểm tra dòng có dạng mệnh lệnh trong policy nằm ở `untrusted_text`, không lọt vào `facts` |
 
 Test challenge: số bug tìm được trong tool có sẵn (nếu có), cách sửa, và test regression tương ứng.
+
+Tìm được 2 bug trong tool có sẵn `format` ([`tools/format/tool.py`](../../starter_v0/tools/format/tool.py)), cả hai đều do input mà model hay gửi:
+
+| Bug | Tái hiện | Sửa | Regression test |
+|---|---|---|---|
+| Model gửi `items` là list chuỗi (`["Tin một", "Tin hai"]`) thì tool raise `AttributeError: 'str' object has no attribute 'get'` thay vì trả kết quả hoặc error dict | `format(items=["tiêu đề 1", "tiêu đề 2"], template="bullets")` → raise | Chuẩn hóa `items`: chuỗi thành `{"title": ...}`, bỏ `None` | `test_format_string_items_from_model_do_not_raise` |
+| Item không có `url`/`source` render thành `"- text - "`, dư dấu phân cách ở cuối | `format(items=[{"title": "Không có link"}], template="bullets")` → `'- Không có link - '` | Chỉ thêm ` - <nguồn>` khi có nguồn | `test_format_item_without_url_has_no_dangling_separator` |
+
+Cả 2 test FAIL trên code gốc (đúng lỗi `AttributeError` và dấu gạch nối dư ở cuối) và PASS sau khi sửa.
+Khi viết test cho tool của nhóm, test cũng bắt được một lỗi của chính mình: `hn_search(limit=0)` trả 5 kết quả thay vì kẹp về 1 như `TOOL.md` mô tả, vì `int(limit or 5)` coi 0 là "không truyền"; đã sửa ở `hn_search` và `hf_model` để chỉ dùng mặc định khi thiếu giá trị.
 
 ### B7. Small Local Model Challenge (bonus)
 
