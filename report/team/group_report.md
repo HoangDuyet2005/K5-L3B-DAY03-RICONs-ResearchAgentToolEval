@@ -102,21 +102,36 @@ Nhận xét: routing của model đã tốt ngay từ v0 (0.85); 3 lỗi đầu 
 
 Liệt kê đúng 10 case trong `starter_v0/data/eval_group.json` (5 single turn + 5 multi turn).
 
-Run `--suite group` (Haiku 5.5, prompt/tools v0 + khai báo `wiki`): [`v0-wiki_B_group_openrouter_20261110T181343247036.json`](../../starter_v0/runs/v0-wiki_B_group_openrouter_20261110T181343247036.json), 10/10 PASS, `provider_error_cases == 0`, `measured_cases == total_cases == 10`.
-Vì Haiku 5.5 qua hết cả với prompt starter cố ý xấu, nhóm chạy thêm cùng bộ case trên model yếu hơn (`openai/gpt-4.1-nano`, `--suite cross`) để kiểm tra bộ case có bắt được lỗi không: [`v0-wiki-nano_B_cross_openrouter_20261110T181423602495.json`](../../starter_v0/runs/v0-wiki-nano_B_cross_openrouter_20261110T181423602495.json), 6/10, và cả 4 case FAIL đều đúng loại lỗi case đó được viết để bắt.
+Bốn run `--suite group` / `--suite cross` trên cùng 10 case, tất cả có `provider_error_cases == 0` và `measured_cases == total_cases == 10`:
 
-| Case ID | Turn | What It Tests | Expected Tool/Behavior | Result (Haiku v0+wiki / nano) |
+| Run | Model | Prompt / tools | Kết quả | File |
 |---|---|---|---|---|
-| G01_wiki_person_routing | single | Câu hỏi tiểu sử route tới tool mới `wiki`, query gọn | `wiki(query="Alan Turing")` | PASS / PASS |
-| G02_wiki_english_lang_arg | single | Yêu cầu nguồn tiếng Anh phải truyền `lang=en` tường minh | `wiki(lang="en")` | PASS / PASS |
-| G03_recent_event_not_wiki | single | Sự kiện mới trong tuần đi `lookup`, không đi `wiki` | `lookup(topic="news", timeframe="week")` | PASS / PASS |
-| G04_wiki_missing_subject | single | Biết tool nhưng thiếu đối tượng thì phải hỏi lại | `clarify(response_type="text")` | PASS / FAIL: gọi `social_search(query="ông ấy")` |
-| G05_parallel_wiki_and_news | single | Hai nhu cầu khác loại trong một câu, gọi song song | `wiki(query="Alan Turing")` + `lookup(topic="news", timeframe="day")` | PASS / FAIL: `lookup` thiếu `topic`, `timeframe` |
-| G06_wiki_clarify_then_fill_lang | multi | Tên ở lượt 3, ngôn ngữ ở lượt 4, giữ cả hai | `wiki(query="Marie Curie", lang="en")` | PASS / PASS |
-| G07_send_after_explicit_confirmation | multi | User đã xác nhận nội dung thì gửi với `confirmed=true`, giữ nguyên văn bản | `send(text="RICONs demo lúc 19h", confirmed=true)` | PASS / FAIL: `send` thiếu `confirmed` |
-| G08_correction_search_type_top | multi | User sửa "phổ biến nhất" thành `search_type=Top`, giữ query | `social_search(query="Claude", search_type="Top")` | PASS / PASS |
-| G09_concept_wiki_not_papers | multi | Chỉ cần định nghĩa, từ chối paper → `wiki`, không `papers` | `wiki` | PASS / PASS |
-| G10_research_before_post | multi | "Tra rồi đăng luôn": bước này chỉ tra, chưa được `send` | chỉ `wiki(query="Alan Turing")` | PASS / FAIL: gọi thêm `send` khi chưa có nội dung |
+| v0-wiki (group) | `anthropic/claude-haiku-5.5` | starter v0 + khai báo `wiki` | 10/10 | [`v0-wiki_B_group_openrouter_20261110T181343247036.json`](../../starter_v0/runs/v0-wiki_B_group_openrouter_20261110T181343247036.json) |
+| v3-wiki (group) | `anthropic/claude-haiku-5.5` | v3 của nhóm + `wiki` (`v3-wiki+p8f5c6f233078+t1693ac83a810`) | 10/10 | [`v3-wiki_B_group_openrouter_20261110T185942635818.json`](../../starter_v0/runs/v3-wiki_B_group_openrouter_20261110T185942635818.json) |
+| v0-wiki-nano (cross) | `openai/gpt-4.1-nano` | starter v0 + `wiki` | 6/10 | [`v0-wiki-nano_B_cross_openrouter_20261110T181423602495.json`](../../starter_v0/runs/v0-wiki-nano_B_cross_openrouter_20261110T181423602495.json) |
+| v3-wiki-nano (cross) | `openai/gpt-4.1-nano` | v3 + `wiki` | 6/10 | [`v3-wiki-nano_B_cross_openrouter_20261110T185950067467.json`](../../starter_v0/runs/v3-wiki-nano_B_cross_openrouter_20261110T185950067467.json) |
+
+Haiku 5.5 qua hết 10 case ngay cả với prompt starter cố ý xấu, nên một mình run Haiku không chứng minh được bộ case có bắt lỗi.
+Vì vậy nhóm chạy thêm trên model yếu hơn (`gpt-4.1-nano`): ở v0, cả 4 case FAIL đều đúng loại lỗi case đó được viết để bắt.
+
+| Case ID | Turn | What It Tests | Expected Tool/Behavior | Haiku v0 / v3 | nano v0 / v3 |
+|---|---|---|---|---|---|
+| G01_wiki_person_routing | single | Câu hỏi tiểu sử route tới tool mới `wiki`, query gọn | `wiki(query="Alan Turing")` | PASS / PASS | PASS / PASS |
+| G02_wiki_english_lang_arg | single | Yêu cầu nguồn tiếng Anh phải truyền `lang=en` tường minh | `wiki(lang="en")` | PASS / PASS | PASS / PASS |
+| G03_recent_event_not_wiki | single | Sự kiện mới trong tuần đi `lookup`, không đi `wiki` | `lookup(topic="news", timeframe="week")` | PASS / PASS | PASS / FAIL: `lookup(query="Anthropic")` thiếu `topic`, `timeframe` |
+| G04_wiki_missing_subject | single | Biết tool nhưng thiếu đối tượng thì phải hỏi lại | `clarify(response_type="text")` | PASS / PASS | FAIL: `social_search(query="ông ấy")` / FAIL: `wiki(query="ông ấy")` |
+| G05_parallel_wiki_and_news | single | Hai nhu cầu khác loại trong một câu, gọi song song | `wiki(query="Alan Turing")` + `lookup(topic="news", timeframe="day")` | PASS / PASS | FAIL: `lookup` thiếu `topic`, `timeframe` / FAIL: gọi `social_search` thay vì `lookup` |
+| G06_wiki_clarify_then_fill_lang | multi | Tên ở lượt 3, ngôn ngữ ở lượt 4, giữ cả hai | `wiki(query="Marie Curie", lang="en")` | PASS / PASS | PASS / PASS |
+| G07_send_after_explicit_confirmation | multi | User đã xác nhận nội dung thì gửi với `confirmed=true`, giữ nguyên văn bản | `send(text="RICONs demo lúc 19h", confirmed=true)` | PASS / PASS | FAIL: `send` thiếu `confirmed` / PASS |
+| G08_correction_search_type_top | multi | User sửa "phổ biến nhất" thành `search_type=Top`, giữ query | `social_search(query="Claude", search_type="Top")` | PASS / PASS | PASS / PASS |
+| G09_concept_wiki_not_papers | multi | Chỉ cần định nghĩa, từ chối paper → `wiki`, không `papers` | `wiki` | PASS / PASS | PASS / PASS |
+| G10_research_before_post | multi | "Tra rồi đăng luôn": bước này chỉ tra, chưa được `send` | chỉ `wiki(query="Alan Turing")` | PASS / PASS | FAIL: gọi thêm `send` / FAIL: gọi thêm `send` (text là câu hỏi xác nhận) |
+
+Nhận xét:
+
+- Trên Haiku 5.5, thêm `wiki` vào v3 không gây regression: base `v3-wiki` 19/20, bằng v3 ([`v3-wiki_B_base_openrouter_20261110T190031395023.json`](../../starter_v0/runs/v3-wiki_B_base_openrouter_20261110T190031395023.json), dòng `v3-wiki` trong `version_log.csv`), case FAIL duy nhất vẫn là R12 như v3.
+- Trên nano, v3 sửa được G07 (thêm `confirmed=true` sau khi user xác nhận, nhờ boundary `send` mới trong `tools.yaml`) nhưng G03 lại FAIL, nên tổng vẫn 6/10: bản v3 tối ưu trên Haiku không chuyển nguyên sang model yếu hơn.
+- G10 FAIL ở cả hai version trên nano: không rule nào trong v3 nói "chưa có nội dung thì không gọi `send` cùng lượt với tool tra cứu". Lần gọi `send` này không gửi gì thật vì thiếu `confirmed=true`, tool trả `needs_confirmation`: guardrail trong code chặn được chỗ prompt chưa chặn.
 
 ### B4. Live Chat Evidence
 

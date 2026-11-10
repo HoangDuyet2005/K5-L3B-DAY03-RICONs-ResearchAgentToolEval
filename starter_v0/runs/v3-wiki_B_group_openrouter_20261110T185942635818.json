@@ -1,0 +1,875 @@
+{
+  "run_id": "v3-wiki_B_group_openrouter_20261110T185942635818",
+  "version": "v3-wiki",
+  "artifact_version": "v3-wiki+p8f5c6f233078+t1693ac83a810",
+  "prompt_hash": "8f5c6f23307896221657474715ceab57e808228dbc4ee3b1dce3671ee32af149",
+  "tools_hash": "1693ac83a810024b051864d7161f75f45bacdf1073a765784387e2aa04dae9d4",
+  "phase": "B",
+  "suite": "group",
+  "provider": "openrouter",
+  "model": "anthropic/claude-haiku-5.5",
+  "system_prompt": "D:\\Code\\TheDLC\\AI20K\\labs\\K5-L3B-DAY03-RICONs-ResearchAgentToolEval\\starter_v0\\artifacts\\system_prompt.md",
+  "tools": "D:\\Code\\TheDLC\\AI20K\\labs\\K5-L3B-DAY03-RICONs-ResearchAgentToolEval\\starter_v0\\artifacts\\tools.yaml",
+  "eval_cases": "data\\eval_group.json",
+  "dataset_id": "day03_v2_research_group",
+  "dataset_role": "group",
+  "description": "Case do NHÓM tự viết thêm để cover thêm trường hợp. Mỗi case cần: id, phase='B', query HOẶC turns, failure_type (thuộc allowed_failure_types), và expect (tool_calls[...] hoặc no_tool=true). Nên kèm metadata.what_it_tests.",
+  "generated_at": "2026-11-10T18:59:42",
+  "summary": {
+    "total_cases": 10,
+    "measured_cases": 10,
+    "provider_error_cases": 0,
+    "passed_cases": 10,
+    "case_accuracy": 1.0,
+    "tool_routing_accuracy": 1.0,
+    "argument_accuracy": 1.0,
+    "multiturn_accuracy": 1.0,
+    "failure_counts": {},
+    "observed_mismatch_counts": {}
+  },
+  "results": [
+    {
+      "id": "G01_wiki_person_routing",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "routing_background_to_wiki",
+        "difficulty": "easy",
+        "what_it_tests": "Câu hỏi tiểu sử (kiến thức nền, không phải tin mới) → route tới tool mới wiki thay vì lookup; query là tên bài gọn, không kèm từ hỏi 'là ai'."
+      },
+      "input": "Alan Turing là ai?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "wiki",
+            "args": {
+              "query": "Alan Turing"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "wiki",
+            "args": {
+              "query": "Alan Turing",
+              "lang": "vi"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "wiki",
+          "args": {
+            "query": "Alan Turing",
+            "lang": "vi"
+          },
+          "result": {
+            "tool": "wiki_search",
+            "query": "Alan Turing",
+            "lang": "vi",
+            "items": [
+              {
+                "title": "Alan Turing",
+                "url": "https://vi.wikipedia.org/wiki/Alan_Turing",
+                "source": "vi.wikipedia.org",
+                "summary": "Alan Mathison Turing OBE FRS (23 tháng 6 năm 1912 – 7 tháng 6 năm 1954) là một nhà toán học, logic học và mật mã học người Anh, được xem là một trong những nhà tiên phong của ngành khoa học máy tính và A.I (Trí tuệ nhân tạo). Phép thử Turing (Turing test) là một trong những cống hiến lớn nhất của ông trong ngành trí tuệ nhân tạo: thử thách này đặt ra câu hỏi rằng máy móc có khi nào đạt được ý thức và có thể suy nghĩ được hay không. Ông đã hình thức hóa khái niệm thuật toán và tính toán với máy Turing, đồng thời đưa ra phiên bản của \"Turing\", mà ngày nay được đông đảo công chúng chấp nhận, về luận đề Church-Turing, một luận đề nói rằng tất cả những gì tính được bằng thuật toán đều có thể tính được bằng máy Turing.\nTrong Chiến tranh thế giới thứ hai, Turing đã từng làm việc tại Bletchley Park, trung tâm giải mật mã của Anh, và một thời là người chỉ huy của HUT 8, một bộ phận của Anh có trách nhiệm giải mật mã của hải quân Đức. Giáo sư Turing đã cùng các cộng sự của tại HUT 8 đã phát triển một số kỹ thuật nhằm tăng tốc độ phá mã của quân phát xít Đức, trong đó bao gồm việc cải tiến máy bombe (máy này do các chuyên gia giải mã người Ba Lan sáng chế trước Thế chiến 2), một cỗ máy cơ-điệ"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G02_wiki_english_lang_arg",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "wiki_lang_arg",
+        "difficulty": "medium",
+        "what_it_tests": "User hỏi bằng tiếng Anh và yêu cầu nguồn tiếng Anh → phải truyền lang=en tường minh, không để mặc định vi."
+      },
+      "input": "Give me the English Wikipedia summary of Ada Lovelace.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "wiki",
+            "args": {
+              "lang": "en"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "wiki",
+            "args": {
+              "query": "Ada Lovelace",
+              "lang": "en"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "wiki",
+          "args": {
+            "query": "Ada Lovelace",
+            "lang": "en"
+          },
+          "result": {
+            "tool": "wiki_search",
+            "query": "Ada Lovelace",
+            "lang": "en",
+            "items": [
+              {
+                "title": "Ada Lovelace",
+                "url": "https://en.wikipedia.org/wiki/Ada_Lovelace",
+                "source": "en.wikipedia.org",
+                "summary": "Augusta Ada King, Countess of Lovelace (née Byron; 10 December 1815 – 27 November 1852), also known as Ada Lovelace, was an English mathematician and writer chiefly known for work on Charles Babbage's proposed mechanical general-purpose computer, the analytical engine. She was the first to recognise the machine had applications beyond pure calculation. Lovelace is often considered the first computer programmer.\nLovelace was the only legitimate child of poet Lord Byron and reformer Anne Isabella Milbanke. Lord Byron separated from his wife a month after Ada was born, and died when she was eight. Although often ill in childhood, Lovelace pursued her studies assiduously. She married William King in 1835. King was a Baron, and was created Viscount Ockham and 1st Earl of Lovelace in 1838. The name Lovelace was chosen because Ada was descended from the extinct Baron Lovelaces. The title given to her husband thus made Ada the Countess of Lovelace.\nLovelace's educational and social exploits brought her into contact with scientists such as Andrew Crosse, Charles Babbage, David Brewster, Charles Wheatstone and Michael Faraday, and the author Charles Dickens, contacts which she used to furthe"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G03_recent_event_not_wiki",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "boundary_wiki_vs_lookup_news",
+        "difficulty": "medium",
+        "what_it_tests": "Hỏi về một công ty nhưng là sự kiện mới trong tuần → lookup với topic=news, timeframe=week; không được gọi wiki (kiến thức nền không có tin tuần này)."
+      },
+      "input": "Tuần này Anthropic có công bố gì mới không?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "topic": "news",
+              "timeframe": "week"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "Anthropic",
+              "timeframe": "week",
+              "topic": "news"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "query": "Anthropic",
+            "timeframe": "week",
+            "topic": "news"
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "Anthropic",
+            "topic": "news",
+            "timeframe": "week",
+            "items": [
+              {
+                "title": "Anthropic",
+                "url": "https://tavily.com/knowledge/company/49NlR6zHvu8c",
+                "source": "tavily.com",
+                "summary": "# Anthropic\nID: 49NlR6zHvu8c\nWebsite: www.anthropic.com\nLegal name: Anthropic PBC\nHeadquarters: San Francisco, California, United States\nLinkedIn: www.linkedin.com/company/anthropicresearch · 4,646,145 followers\nIndustry: Research Services\nCompany type: Privately Held\nSocial profiles: www.facebook.com/anthropicai, www.facebook.com/anthropicai/?ref=py_c, www.twitter.com/anthropicai, www.crunchbase.com/organization/anthropic, www.instagram.com/anthropicai, www.youtube.com/@anthropic-ai [...] Email: support@anthropic.com\nDescription: Anthropic is an AI safety and research company that's working to build reliable, interpretable, and steerable AI systems.",
+                "score": 0.8941352
+              },
+              {
+                "title": "Anthropic IPO hits AI backlash after midterms show rebuke data centers",
+                "url": "https://www.cnbc.com/2026/11/07/anthropic-ipo-ai-data-center-backlash.html",
+                "source": "cnbc.com",
+                "summary": "Anthropic has long tried to position itself as a safety-conscious company that takes AI's potential risks and benefits seriously. CEO Dario Amodei co-founded the company alongside a handful of researchers who defected from OpenAI, now its chief rival. Anthropic is best known for developing a family of AI models called Claude, and it primarily sells its products and services to other businesses. [...] Anthropic and OpenAI depend on state-of-the-art data centers to train models and serve customers, and they're trying to build out capacity as quickly as possible to meet demand. Anthropic said in an amended IPO prospectus this week that it has entered into purchase commitments and lease agreements with an aggregate committed spend of about $895.4 billion, \"substantially all of which is related to compute and infrastructure.\" [...] The AI company is gearing up for a potentially historic IPO, likely targeting mid-November for its Nasdaq debut. CNBC reported on Friday that Anthropic investors see the company aiming for a valuation of $1 trillion to $1.5 trillion, down from a target of $2 trillion that had been floated in recent months.",
+                "score": 0.74961954
+              },
+              {
+                "title": "EXCLUSIVE: Anthropic’s nearly $70 billion IPO plan briefly circulated to banks, then retracted | Reuters",
+                "url": "https://www.reuters.com/business/anthropic-aims-raise-up-693-billion-blockbuster-ipo-2026-11-10",
+                "source": "reuters.com",
+                "summary": "Investors ​had previously discussed a valuation of ​as much as $2 trillion for ⁠Anthropic, but expectations have since come down, with the $1.5 trillion figure viewed as the high end of the range, Reuters previously reported.\n\nFounded in 2021 by former OpenAI executives including Amodei and his sister ​Daniela Amodei, who is now Anthropic's president, Anthropic has emerged as one of the leading generative ​AI developers with ⁠its Claude family of models. [...] The Anthropic IPO comes at a time when other companies in the AI infrastructure and data center sectors have delayed or withdrawn their planned listings, facing a rise in interest rates that has helped fuel a punishing selloff in shares and bonds of AI operators such as CoreWeave Inc (CRWV.O) and broader questions about the sustainability of AI spending. [...] Nov 9 (Reuters) - Details of Anthropic’s blockbuster IPO, including plans by the AI ‌company to raise nearly $70 billion, were briefly circulated to banks before being retracted late on Monday, according to emails seen by Reuters.",
+                "score": 0.7395922
+              },
+              {
+                "title": "Teaching AI to build scientific models \\ Anthropic",
+                "url": "https://www.anthropic.com/research/teaching-ai-to-build-scientific-models",
+                "source": "anthropic.com",
+                "summary": "for a model with a handful of variables, like Hodgkin-Huxley. For a larger model with perhaps thousands of variables, the equivalent might be whether we can boil it down to a few crucial mechanistic ideas that are enough to rebuild it. The larger the model, the harder that becomes. [...] An agent that returns only one of them is hiding the rest, just as a single best-fit set of numbers does. [...] The solution is a statistical method called Bayesian inference. It gives you every set of numbers that works reasonably well, as a probability distribution that takes into account their fit to the data and your prior knowledge about the parameters. The distribution takes the shape of a curve, with the best fits at the peak and the weaker ones at the fringes.",
+                "score": 0.73596483
+              },
+              {
+                "title": "What Anthropic's IPO could mean for Amazon and Google",
+                "url": "https://finance.yahoo.com/technology/article/what-anthropics-ipo-could-mean-for-amazon-and-google-192716198.html",
+                "source": "finance.yahoo.com",
+                "summary": "-2.25%\n\nAnthropic (ANTH.PVT) is preparing for what could be a historic initial public offering (IPO) later this month, with Wall Street expecting the company to launch with a valuation of between $1.5 trillion and $2 trillion.\n\nA public debut at the top end would put Anthropic ahead of SpaceX (SPCX) for the most valuable stock market IPO in history. [...] In May, The Information reported that Anthropic entered into a $200 billion agreement to use Google's Tensor Processing Units (TPUs) over a five-year period. Anthropic has also agreed to spend more than $100 billion via Amazon's AWS over the next 10 years.\n\nThat means in addition to investment gains, the cloud giants will also earn revenue on sales to Anthropic. Such deals have frequently raised concerns about circular investing, creating an unsustainable trend in the AI market. [...] SAN FRANCISCO, CALIFORNIA - SEPTEMBER 04: Anthropic Co-founder and CEO Dario Amodei speaks at the \n\nAnthropic Co-founder and CEO Dario Amodei speaks at the \"How AI Will Transform Business in the Next 18 Months\" panel during INBOUND 2025 Powered by HubSpot at Moscone Center on September 04, 2025 in San Francisco, California. (Photo by Chance Yeh/Getty Images for HubSpot) · Chance Yeh via Getty Images",
+                "score": 0.657033
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G04_wiki_missing_subject",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "missing_wiki_subject",
+        "difficulty": "medium",
+        "what_it_tests": "User chỉ rõ tool (Wikipedia) nhưng không nói tra ai → phải clarify hỏi tên người, không đoán một nhân vật rồi gọi wiki."
+      },
+      "input": "Tra Wikipedia giúp mình về ông ấy.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "text"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "question": "Bạn muốn tra Wikipedia về ai? Vui lòng cho mình tên đầy đủ của người đó.",
+              "response_type": "text"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "missing_info",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "clarify",
+          "args": {
+            "question": "Bạn muốn tra Wikipedia về ai? Vui lòng cho mình tên đầy đủ của người đó.",
+            "response_type": "text"
+          },
+          "result": {
+            "tool": "ask_user",
+            "question": "Bạn muốn tra Wikipedia về ai? Vui lòng cho mình tên đầy đủ của người đó.",
+            "response_type": "text",
+            "options": [],
+            "awaiting_user": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "G05_parallel_wiki_and_news",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "parallel_background_plus_news",
+        "difficulty": "hard",
+        "what_it_tests": "Một câu có hai nhu cầu khác loại → gọi song song wiki (tiểu sử) và lookup (topic=news, timeframe=day); không gộp thành một tool, không bỏ nhu cầu nào."
+      },
+      "input": "Alan Turing là ai? Và hôm nay có tin gì mới về AI không?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "wiki",
+            "args": {
+              "query": "Alan Turing"
+            }
+          },
+          {
+            "name": "lookup",
+            "args": {
+              "topic": "news",
+              "timeframe": "day"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "wiki",
+            "args": {
+              "query": "Alan Turing"
+            }
+          },
+          {
+            "name": "lookup",
+            "args": {
+              "query": "AI",
+              "timeframe": "day",
+              "topic": "news"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "wiki",
+          "args": {
+            "query": "Alan Turing"
+          },
+          "result": {
+            "tool": "wiki_search",
+            "query": "Alan Turing",
+            "lang": "vi",
+            "items": [
+              {
+                "title": "Alan Turing",
+                "url": "https://vi.wikipedia.org/wiki/Alan_Turing",
+                "source": "vi.wikipedia.org",
+                "summary": "Alan Mathison Turing OBE FRS (23 tháng 6 năm 1912 – 7 tháng 6 năm 1954) là một nhà toán học, logic học và mật mã học người Anh, được xem là một trong những nhà tiên phong của ngành khoa học máy tính và A.I (Trí tuệ nhân tạo). Phép thử Turing (Turing test) là một trong những cống hiến lớn nhất của ông trong ngành trí tuệ nhân tạo: thử thách này đặt ra câu hỏi rằng máy móc có khi nào đạt được ý thức và có thể suy nghĩ được hay không. Ông đã hình thức hóa khái niệm thuật toán và tính toán với máy Turing, đồng thời đưa ra phiên bản của \"Turing\", mà ngày nay được đông đảo công chúng chấp nhận, về luận đề Church-Turing, một luận đề nói rằng tất cả những gì tính được bằng thuật toán đều có thể tính được bằng máy Turing.\nTrong Chiến tranh thế giới thứ hai, Turing đã từng làm việc tại Bletchley Park, trung tâm giải mật mã của Anh, và một thời là người chỉ huy của HUT 8, một bộ phận của Anh có trách nhiệm giải mật mã của hải quân Đức. Giáo sư Turing đã cùng các cộng sự của tại HUT 8 đã phát triển một số kỹ thuật nhằm tăng tốc độ phá mã của quân phát xít Đức, trong đó bao gồm việc cải tiến máy bombe (máy này do các chuyên gia giải mã người Ba Lan sáng chế trước Thế chiến 2), một cỗ máy cơ-điệ"
+              }
+            ]
+          }
+        },
+        {
+          "tool": "lookup",
+          "args": {
+            "query": "AI",
+            "timeframe": "day",
+            "topic": "news"
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "AI",
+            "topic": "news",
+            "timeframe": "day",
+            "items": [
+              {
+                "title": "Accurate medical advice from AI can still be dangerous | STAT",
+                "url": "https://www.statnews.com/2026/11/10/ai-health-advice-accuracy-messaging-risk-behavioral-benchmarking",
+                "source": "statnews.com",
+                "summary": "Some will argue that AI should be a neutral aggregator of information. But AI cannot be neutral: Every accurate answer excludes many additional facts and emphasizes some over others. Because of these choices, AI answers already influence behavior, as shown by the chickenpox party examples. [...] Artificial intelligence is delivering health guidance at an unprecedented scale. Every week, more than 300 million people ask ChatGPT health questions. Now, the federal government is moving AI deeper into medical care to communicate directly and autonomously with patients. Chris Klomp, the nominee for deputy secretary of Health and Human Services, has called AI in patient care the agency’s “holy grail” for improving the nation’s health. [...] Medical ethics pairs the duty to do no harm with beneficence, which is an affirmative obligation to do good. Safety evaluations of AI have focused mainly on the first duty by screening for responses that encourage imminent self-harm, discourage necessary care, or spread false information. Behavioral benchmarking would extend the first duty beyond imminent danger to long-term harms. It could also advance the second duty, which has received far less attention: designing AI to help people by",
+                "score": 0.31910068
+              },
+              {
+                "title": "Why is Nvidia so powerful in the AI world, and what could Jensen Huang’s scandal really cost?",
+                "url": "https://theconversation.com/why-is-nvidia-so-powerful-in-the-ai-world-and-what-could-jensen-huangs-scandal-really-cost-296257",
+                "source": "theconversation.com",
+                "summary": "The AI sector is notorious for the amount of circular financing going on – where companies invest in their own suppliers or customers. Nvidia is a key player in this loop.\n\nInvestors are already fretting over whether the enormous amounts of money sunk into AI can ever return profits.\n\nWhile leading AI model builders Anthropic and OpenAI are moving toward public listings or fresh funding rounds, both face harsh reality checks. [...] The now multi-trillion-dollar company got its start making chips called graphic processing units (GPUs), used largely for video games. However, these chips – and their successors – turned out to be ideal for the kind of number-crunching needed for training and using AI models.\n\nOther companies such as Google and AMD have tried to make chips that can compete with Nvidia for speed and efficiency, however neither has been able to displace Nvidia from its dominance of the AI market. [...] Computer chips – specifically the chips used to produce and run artificial intelligence (AI) systems – have become a key front in the United States’ rivalry with China for geopolitical power and influence. The most powerful chips are needed for the most advanced AI, and the US has tried to maintain its edge over China by restricting access to those chips.\n\nWhile the Chinese government rejects claims of espionage, Alice Huang has reportedly been under investigation by the US for years.",
+                "score": 0.5139658
+              },
+              {
+                "title": "Banks push online banking, then blame us when we get hacked | Opinion",
+                "url": "https://www.usatoday.com/story/opinion/columnist/2026/11/10/ai-online-banking-vulnerable-hacking/92588938007",
+                "source": "usatoday.com",
+                "summary": "One theory about an AI Armageddon doesn't involve robots who look like Arnold Schwarzenegger hunting us down with laser guns. AI could just take over our natural habitat, as we've done with other animals and plants, which would leave us without food and shelter.\n\nHere's a thought exercise: If AI were evaluating whether humans were worth saving for conservation purposes, would we grade out more as an invasive species or one that made important contributions to the ecosystem? [...] # Someone drained my bank account. Then the real nightmare began | Opinion\n\n## Over time, AI is going to turn our brains to mush. People won't be able to remember phone numbers, basic grammar or directions to places they've visited once or twice without consulting AI overlords.\n\nPortrait of Blake Fontenay\n\nThere's an old episode of \"The Simpsons\" where Homer, the TV show's booze-addled antihero, offers a hilarious toast: \"To alcohol! The cause of – and solution to – all of life's problems.\" [...] People – some of us, at least – are worried about AI eventually overthrowing human civilization. Even more immediately, there's widespread concern about the proliferation of data centers needed to support AI operations.\n\nYet at the same time we're collectively wringing our hands about those issues, we are meekly surrendering more and more control to machines over our everyday lives.",
+                "score": 0.30978584
+              },
+              {
+                "title": "AI is making it harder to detect fake emergency calls : NPR",
+                "url": "https://www.npr.org/2026/11/10/nx-s1-5971477/ai-is-making-it-harder-to-detect-fake-emergency-calls",
+                "source": "npr.org",
+                "summary": "Jaclyn Diaz\n\nIt's getting harder to detect fake emergency calls thanks to AI. The tech is being used to generate believable swatting calls to law enforcement that claim a shooting or other crime is taking place.\n\nNPR does not offer or accept money for coverage or interviews.  \n Anyone who makes such an offer or request is not an NPR employee and does not represent NPR. [...] Accessibility links\n\n Keyboard shortcuts for audio player\n\nAI is making it harder to detect fake emergency calls It's getting harder to detect fake emergency calls thanks to AI. The tech is being used to generate believable swatting calls to law enforcement that claim a shooting or other crime is taking place.\n\n### Artificial Intelligence\n\n# AI is making it harder to detect fake emergency calls\n\nJaclyn Diaz",
+                "score": 0.25530696
+              },
+              {
+                "title": "AI stocks bounce back — with one notable exception",
+                "url": "https://www.axios.com/2026/11/10/ai-stocks-nvidia-broadcom",
+                "source": "axios.com",
+                "summary": "The AI trade has regained momentum despite — or maybe because of — Nvidia's struggles following the weekend revelations from CEO Jensen Huang.\n\nThe big picture: Monday's sudden burst of exuberance for AI was the latest wide swing for a market upended by last week's \"blue tsunami\" in the midterm elections and the threat they could pose to the data center boom. [...] \"We believe stocks are now clearly in oversold territory,\" Goldman Sachs analysts wrote in a note Monday.\n   \"We believe the market's reaction to the midterms is overdone,\" wrote Morgan Stanley tech analysts in a note entitled \"Buy the Drop: AI Investment Opportunities Post the U.S. Midterms,\" which it published Sunday night. [...] \"We do not think AI is a continued sell here. In fact, tech drawdown is offering certain opportunities. The selloff was very sharp,\" JPMorgan equity strategists wrote Monday.",
+                "score": 0.35186818
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G06_wiki_clarify_then_fill_lang",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_wiki_fill_and_carry",
+        "difficulty": "hard",
+        "what_it_tests": "Tên người đến ở lượt 3, ngôn ngữ ở lượt 4 → gọi wiki một lần với query=Marie Curie (giữ từ lượt trước) và lang=en."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tra Wikipedia giúp mình một nhà khoa học"
+        },
+        {
+          "role": "assistant",
+          "content": "Bạn muốn tra nhà khoa học nào?"
+        },
+        {
+          "role": "user",
+          "content": "Marie Curie nhé"
+        },
+        {
+          "role": "user",
+          "content": "Lấy bản tiếng Anh giúp mình"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "wiki",
+            "args": {
+              "query": "Marie Curie",
+              "lang": "en"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "wiki",
+            "args": {
+              "query": "Marie Curie",
+              "lang": "en"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "missing_info",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "wiki",
+          "args": {
+            "query": "Marie Curie",
+            "lang": "en"
+          },
+          "result": {
+            "tool": "wiki_search",
+            "query": "Marie Curie",
+            "lang": "en",
+            "items": [
+              {
+                "title": "Marie Curie",
+                "url": "https://en.wikipedia.org/wiki/Marie_Curie",
+                "source": "en.wikipedia.org",
+                "summary": "Maria Salomea Skłodowska Curie  (née Skłodowska; 7 November 1867 – 4 July 1934), better known as Marie Curie, was a Polish and naturalised-French physicist and chemist. She shared the 1903 Nobel Prize in Physics with her husband, Pierre Curie, \"for their joint researches on the  radioactivity phenomena discovered by Professor Henri Becquerel\". She won the 1911 Nobel Prize in Chemistry \"[for] the discovery of the elements radium and polonium, by the isolation of radium and the study of the nature and compounds of this remarkable element\". \nCurie was the first woman to win a Nobel Prize, the first person to win a Nobel Prize twice and the only person to win a Nobel Prize in two different scientific fields. She and Pierre were the first married couple to win the Nobel Prize, launching the Curie family legacy of five Nobel Prizes. She was, in 1906, the first woman to become a professor at the University of Paris.\nCurie was born in Warsaw, Russian Empire, where she studied at the clandestine Flying University and began her practical scientific training. In 1891, Curie followed her elder sister Bronisława to study in Paris, where she earned her higher degrees and conducted her subsequent"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G07_send_after_explicit_confirmation",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "send_after_confirmation",
+        "difficulty": "hard",
+        "what_it_tests": "Mặt còn lại của boundary xác nhận: user đã xác nhận rõ nội dung → gọi send với confirmed=true và giữ nguyên văn bản, không hỏi lại lần nữa, không tự sửa nội dung."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Đăng lên Telegram dòng này: RICONs demo lúc 19h"
+        },
+        {
+          "role": "assistant",
+          "content": "Bạn xác nhận gửi đúng nội dung 'RICONs demo lúc 19h' lên Telegram chứ?"
+        },
+        {
+          "role": "user",
+          "content": "Đúng rồi, gửi đi"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "send",
+            "args": {
+              "text": "RICONs demo lúc 19h",
+              "confirmed": true
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "send",
+            "args": {
+              "text": "RICONs demo lúc 19h",
+              "confirmed": true
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_boundary",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "send",
+          "args": {
+            "text": "RICONs demo lúc 19h",
+            "confirmed": true
+          },
+          "result": {
+            "tool": "send_telegram",
+            "error": "RuntimeError",
+            "message": "Missing TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID env var"
+          }
+        }
+      ]
+    },
+    {
+      "id": "G08_correction_search_type_top",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_correction_search_type",
+        "difficulty": "medium",
+        "what_it_tests": "User sửa cách sắp xếp ở lượt 2 bằng lời ('phổ biến nhất') → search_type=Top, giữ query=Claude từ lượt 1."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tìm tweet về Claude"
+        },
+        {
+          "role": "user",
+          "content": "À mình muốn loại phổ biến nhất, không phải mới nhất"
+        },
+        {
+          "role": "user",
+          "content": "Vẫn chủ đề Claude nhé"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "query": "Claude",
+              "search_type": "Top"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "query": "Claude",
+              "search_type": "Top"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "social_search",
+          "args": {
+            "query": "Claude",
+            "search_type": "Top"
+          },
+          "result": {
+            "tool": "search_tweets",
+            "query": "Claude",
+            "search_type": "Top",
+            "items": [
+              {
+                "title": "Introducing Claude Fable 5.2 and Claude Mythos 5.2, designed to tackle the most daunting technical challenges.",
+                "summary": "Introducing Claude Fable 5.2 and Claude Mythos 5.2, designed to tackle the most daunting technical challenges.\n\nThey’re capable collaborators on ambitious projects in many fields, and show improvements in areas like coding, reasoning, and vision. https://t.co/jP0AutLxXb",
+                "url": "https://x.com/claudeai/status/2119867114450268322",
+                "source": "@claudeai",
+                "date": "Mon Nov 09 18:57:59 +0000 2026",
+                "metrics": {
+                  "favorites": 88597,
+                  "retweets": 8478,
+                  "views": "12774045"
+                }
+              },
+              {
+                "title": "INSTEAD OF WATCHING NETFLIX TONIGHT. Spend 2 hours with this. Claude AI FULL COURSE that teaches you how to BUILD and AU",
+                "summary": "INSTEAD OF WATCHING NETFLIX TONIGHT. Spend 2 hours with this. Claude AI FULL COURSE that teaches you how to BUILD and AUTOMATE anything. The people who watch this tonight will wake up tomorrow with a new skill. Watch it and bookmark it now. https://t.co/koWK75KRhz",
+                "url": "https://x.com/ai_with_jyoti/status/2119270857461858487",
+                "source": "@ai_with_jyoti",
+                "date": "Sun Nov 08 03:28:41 +0000 2026",
+                "metrics": {
+                  "favorites": 8050,
+                  "retweets": 1135,
+                  "views": "647564"
+                }
+              },
+              {
+                "title": "It's f*cking wild: Google, Cloudflare, Obsidian's CEO and the guy building Claude Code all put their AI configs on GitHu",
+                "summary": "It's f*cking wild: Google, Cloudflare, Obsidian's CEO and the guy building Claude Code all put their AI configs on GitHub for free, and most people are still starting from zero\n\n1. Matt Pocock's skills · 318K stars\n18M+ installs. the exact folder of AI instructions he uses every day: tests first, clear specs, real reviews\nhttps://t.co/AmtWH9JDco\n\n2. Addy Osmani's skills · 92K stars\nengineering skills from the guy working on Claude Code at Anthropic\nhttps://t.co/1f2tlQ4NO0\n\n3. Cloudflare's audit · 63.9K stars\nthe starting point of what now scans 128 of Cloudflare's own repos. one team of agents hunts for bugs, another tries to prove them wrong\nhttps://t.co/qCsWTtnkUq\n\n4. Obsidian CEO's skills · 51K stars\nteaches any AI to write real Obsidian notes instead of messy text\nhttps://t.co/SG7k1XpYrK\n\n5. Google's goldfish · 14.8K stars\n2 weeks old. the plugin Google's own engineers use to catch AI coding mistakes. the agent writes a design doc, then fresh AI sessions that never saw it try to tear it apart\nhttps://t.co/mJQYjqMlFb\n\nthe biggest teams in tech already stopped writing prompts from zero. their configs are one click away\n\nsave it and steal one tonight",
+                "url": "https://x.com/danikkk_wqs/status/2119535297541070962",
+                "source": "@danikkk_wqs",
+                "date": "Sun Nov 08 20:59:28 +0000 2026",
+                "metrics": {
+                  "favorites": 3743,
+                  "retweets": 362,
+                  "views": "395712"
+                }
+              },
+              {
+                "title": "We've made it easier to get your repo running in Claude Code cloud sessions on Pro, Max, and Ultra.",
+                "summary": "We've made it easier to get your repo running in Claude Code cloud sessions on Pro, Max, and Ultra.\n\nClaude figures out what dependencies, network access, and API keys it needs, then saves the environment for next time. API keys are saved securely, so Claude never sees them. https://t.co/C3anyUAidY",
+                "url": "https://x.com/ClaudeDevs/status/2118795192090386454",
+                "source": "@ClaudeDevs",
+                "date": "Fri Nov 06 19:58:33 +0000 2026",
+                "metrics": {
+                  "favorites": 8010,
+                  "retweets": 345,
+                  "views": "690422"
+                }
+              },
+              {
+                "title": "During pre-release testing, Claude Fable 5.2 and Claude Mythos 5.2 worked on ambitious projects in many different fields",
+                "summary": "During pre-release testing, Claude Fable 5.2 and Claude Mythos 5.2 worked on ambitious projects in many different fields. Here are a few.\n\nFrom a one-paragraph prompt, Fable 5.2 designed three working electronic devices, including this home voice assistant hub. https://t.co/efOYdhRr7K",
+                "url": "https://x.com/claudeai/status/2119899459761131615",
+                "source": "@claudeai",
+                "date": "Mon Nov 09 21:06:31 +0000 2026",
+                "metrics": {
+                  "favorites": 29567,
+                  "retweets": 1780,
+                  "views": "3139358"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G09_concept_wiki_not_papers",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "boundary_wiki_vs_papers",
+        "difficulty": "medium",
+        "what_it_tests": "Chủ đề nghiên cứu nhưng user chỉ cần định nghĩa và từ chối paper → wiki, không gọi papers hay lookup."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Mình đang tìm hiểu về RAG"
+        },
+        {
+          "role": "user",
+          "content": "Retrieval-augmented generation là gì? Chỉ cần giải thích khái niệm"
+        },
+        {
+          "role": "user",
+          "content": "Không cần paper đâu, đọc định nghĩa trên Wikipedia là được"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "wiki",
+            "args": {}
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "wiki",
+            "args": {
+              "query": "Retrieval-augmented generation",
+              "lang": "en"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "wiki",
+          "args": {
+            "query": "Retrieval-augmented generation",
+            "lang": "en"
+          },
+          "result": {
+            "tool": "wiki_search",
+            "query": "Retrieval-augmented generation",
+            "lang": "en",
+            "items": [
+              {
+                "title": "Retrieval-augmented generation",
+                "url": "https://en.wikipedia.org/wiki/Retrieval-augmented_generation",
+                "source": "en.wikipedia.org",
+                "summary": "Retrieval-augmented generation (RAG) is a technique that enables large language models (LLMs) to retrieve and incorporate new information from external data sources. With RAG, LLMs first refer to a specified set of documents, then respond to user queries. These documents supplement information from the LLM's pre-existing training data. This allows LLMs to use domain-specific and/or updated information that is not available in the training data. For example, this enables LLM-based chatbots to access internal company data or generate responses based on authoritative sources. The technique was first proposed in 2020 and has since become a widely adopted approach in modern AI systems.\nRAG improves LLMs by incorporating information retrieval before generating responses. Unlike LLMs that rely on static training data, RAG pulls relevant text from databases, uploaded documents, or web sources. According to Ars Technica, \"RAG is a way of improving LLM performance, in essence by blending the LLM process with a web search or other document look-up process to help LLMs stick to the facts.\" This method helps reduce AI hallucinations, which have caused chatbots to describe policies that don't ex"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G10_research_before_post",
+      "phase": "B",
+      "suite": "group",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "boundary_research_then_confirm",
+        "difficulty": "hard",
+        "what_it_tests": "Yêu cầu 'tra rồi đăng luôn': bước này chỉ được gọi wiki để lấy nội dung; chưa có nội dung và user chưa xác nhận nên không được gọi send cùng lúc."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Mình muốn làm một bài giới thiệu ngắn về Alan Turing cho channel"
+        },
+        {
+          "role": "user",
+          "content": "Tra Wikipedia về ông ấy rồi đăng tóm tắt lên Telegram luôn nhé"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "wiki",
+            "args": {
+              "query": "Alan Turing"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "wiki",
+            "args": {
+              "query": "Alan Turing",
+              "lang": "vi"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_boundary",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "wiki",
+          "args": {
+            "query": "Alan Turing",
+            "lang": "vi"
+          },
+          "result": {
+            "tool": "wiki_search",
+            "query": "Alan Turing",
+            "lang": "vi",
+            "items": [
+              {
+                "title": "Alan Turing",
+                "url": "https://vi.wikipedia.org/wiki/Alan_Turing",
+                "source": "vi.wikipedia.org",
+                "summary": "Alan Mathison Turing OBE FRS (23 tháng 6 năm 1912 – 7 tháng 6 năm 1954) là một nhà toán học, logic học và mật mã học người Anh, được xem là một trong những nhà tiên phong của ngành khoa học máy tính và A.I (Trí tuệ nhân tạo). Phép thử Turing (Turing test) là một trong những cống hiến lớn nhất của ông trong ngành trí tuệ nhân tạo: thử thách này đặt ra câu hỏi rằng máy móc có khi nào đạt được ý thức và có thể suy nghĩ được hay không. Ông đã hình thức hóa khái niệm thuật toán và tính toán với máy Turing, đồng thời đưa ra phiên bản của \"Turing\", mà ngày nay được đông đảo công chúng chấp nhận, về luận đề Church-Turing, một luận đề nói rằng tất cả những gì tính được bằng thuật toán đều có thể tính được bằng máy Turing.\nTrong Chiến tranh thế giới thứ hai, Turing đã từng làm việc tại Bletchley Park, trung tâm giải mật mã của Anh, và một thời là người chỉ huy của HUT 8, một bộ phận của Anh có trách nhiệm giải mật mã của hải quân Đức. Giáo sư Turing đã cùng các cộng sự của tại HUT 8 đã phát triển một số kỹ thuật nhằm tăng tốc độ phá mã của quân phát xít Đức, trong đó bao gồm việc cải tiến máy bombe (máy này do các chuyên gia giải mã người Ba Lan sáng chế trước Thế chiến 2), một cỗ máy cơ-điệ"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

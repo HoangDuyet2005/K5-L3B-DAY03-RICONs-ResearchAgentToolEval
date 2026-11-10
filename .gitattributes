@@ -1,0 +1,5 @@
+# versioning.py hashes the raw bytes of the prompt and tool declarations.
+# Keep them LF on every OS so prompt_hash / tools_hash in runs match the committed files,
+# even on Windows with core.autocrlf=true.
+starter_v0/artifacts/*.md text eol=lf
+starter_v0/artifacts/*.yaml text eol=lf
