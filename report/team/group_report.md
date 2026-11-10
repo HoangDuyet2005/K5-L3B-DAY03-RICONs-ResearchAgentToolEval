@@ -36,7 +36,7 @@ Mỗi phiên chat được ghi vào `starter_v0/transcripts/*.transcript.json` (
 Cloudflare Tunnel trỏ vào UI đang chạy local: `cloudflared tunnel --url http://localhost:8501`.
 Link `trycloudflare.com` chỉ sống trong phiên chạy lệnh, nên được dán lại mỗi lần mở.
 
-URL:
+URL: link tạm qua Cloudflare Tunnel (`trycloudflare.com`), chỉ hoạt động khi máy nhóm đang chạy `streamlit run app.py` + `cloudflared`; tắt là hết hạn. Để dùng thử, chạy lại 2 lệnh ở trên (cần `starter_v0/.env` có key provider).
 
 ### A2. Tool agent có
 
@@ -189,7 +189,7 @@ Cả 3 có `artifact_version` `ui+p8f5c6f233078+t1693ac83a810`: nhãn là `ui` n
 | Item | Evidence File | What Worked | Risk / Guardrail |
 |---|---|---|---|
 | Tool mới `wiki` | [`starter_v0/tools/wiki/`](../../starter_v0/tools/wiki/) (`tool.py`, `TOOL.md`), đăng ký trong [`tools/__init__.py`](../../starter_v0/tools/__init__.py) và cuối [`artifacts/tools.yaml`](../../starter_v0/artifacts/tools.yaml) | Một request MediaWiki (search + intro), không cần API key; `items` cùng dạng với `lookup` nên đưa thẳng vào `format` được; model route đúng tới `wiki` ở G01, G05, G06, G09, G10 | Input xấu (`query` rỗng, `lang` ngoài `vi`/`en`) trả error dict, không gọi mạng; `max_results` kẹp 1-5; tool chỉ đọc, không side effect |
-| Unit test tool mới (≥ 3 test/tool) | [`tests/test_tools_todo.py`](../../starter_v0/tests/test_tools_todo.py), 7 test `test_wiki_*`; `pytest`: 74 passed, 0 failed, 14 skipped (stub tool có sẵn) | Happy path (request + mapping), input xấu (query rỗng, lang ngoài enum, số dạng chuỗi), nhánh lỗi (HTTP 429, timeout) | Test chạy offline qua `fake_http`; mỗi test assert cả request gửi đi lẫn kết quả trả về |
+| Unit test tool mới (≥ 3 test/tool) | [`tests/test_tools_todo.py`](../../starter_v0/tests/test_tools_todo.py), 7 test `test_wiki_*`; `pytest` lúc thêm `wiki` (`2c00871`): 74 passed, 0 failed, 14 skipped; hiện tại 118 passed, 0 skipped (xem B5) | Happy path (request + mapping), input xấu (query rỗng, lang ngoài enum, số dạng chuỗi), nhánh lỗi (HTTP 429, timeout) | Test chạy offline qua `fake_http`; mỗi test assert cả request gửi đi lẫn kết quả trả về |
 | UI (lệnh chạy + link dùng thử) | [`starter_v0/app.py`](../../starter_v0/app.py), `streamlit run app.py`, link ở mục A1 | Dùng chung `run_model_tool_loop` và `write_transcript` của `chat.py`; chat trên UI được ghi transcript cùng format; nút câu hỏi mẫu ở sidebar | Tool call và kết quả thô hiện dưới mỗi câu trả lời, lỗi tool được tô đỏ (không che lỗi); giới hạn 20 lượt mỗi phiên vì link public dùng key của nhóm |
 
 Tool unit tests: số test đã viết, và một ví dụ lỗi mà unit test bắt được nhưng eval không bắt được.

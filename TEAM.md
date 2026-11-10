@@ -92,6 +92,6 @@ Mỗi thành viên có báo cáo riêng trong `report/team/` theo dạng `MSSV_H
 ### Bằng chứng
 
 - PR [#1](https://github.com/HoangDuyet2005/K5-L3B-DAY03-RICONs-ResearchAgentToolEval/pull/1), commit `2c00871` (tool `wiki` + test), `1cdfc92` (eval nhóm), `69874d4` (UI + Phần A), `8c9eac2` (run v3-wiki, `.gitattributes`), `cb88930` (sửa lịch sử hội thoại, B4, Telegram).
-- `pytest`: 74 passed, 0 failed, 14 skipped (stub của tool có sẵn).
+- `pytest`: 74 passed, 0 failed, 14 skipped lúc thêm `wiki` (`2c00871`); sau khi điền hết stub và thêm 3 tool bonus: 118 passed, 0 failed, 0 skipped.
 - Run: `starter_v0/runs/v3-wiki_B_group_openrouter_20261110T185942635818.json`, `starter_v0/runs/v3-wiki_B_base_openrouter_20261110T190031395023.json`.
 - Transcript: `starter_v0/transcripts/ui_streamlit_openrouter_20261110T193835828410.transcript.json` (gửi Telegram) và 3 transcript khác liệt kê ở B4.
