@@ -1,1 +1,2 @@
 version,author,changed_artifact,artifact_version,prompt_hash,tools_hash,reason,hypothesis,metric_before,metric_after,run_file
+v0,HoangDuyet2005,baseline,v0+peb1c8179815b+te69bc53ed884,eb1c8179815b,e69bc53ed884,baseline starter chưa sửa; model anthropic/claude-haiku-5.5,Đo hành vi chưa tối ưu trước khi sửa,,case_acc=0.70 routing=0.85 args=0.70 multiturn=0.8333,runs/v0_B_base_openrouter_20261110T175934403647.json

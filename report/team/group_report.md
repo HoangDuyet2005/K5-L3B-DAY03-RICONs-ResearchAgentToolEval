@@ -62,7 +62,7 @@ Lấy từ `starter_v0/artifacts/version_log.csv` và `starter_v0/runs/*.json`. 
 
 | Version | Changed Artifact | Hypothesis | Metric Before | Metric After | Run File |
 |---|---|---|---:|---:|---|
-| v0 | baseline |  |  |  |  |
+| v0 | baseline (`system_prompt.md` + `tools.yaml` của starter; model `anthropic/claude-haiku-5.5`) | Đo hành vi chưa tối ưu trước khi sửa | – | case 0.70 · routing 0.85 · args 0.70 · multiturn 0.8333 (14/20 PASS) | `starter_v0/runs/v0_B_base_openrouter_20261110T175934403647.json` |
 | v1 |  |  |  |  |  |
 | v2 |  |  |  |  |  |
 | v3 |  |  |  |  |  |
@@ -71,9 +71,18 @@ Lấy từ `starter_v0/artifacts/version_log.csv` và `starter_v0/runs/*.json`. 
 
 Lấy từ `results[*].result.failures` trong run JSON.
 
+Run v0: `starter_v0/runs/v0_B_base_openrouter_20261110T175934403647.json` — 6/20 FAIL, chia thành 2 nhóm nguyên nhân.
+
 | Case ID | Failure Type | Actual Tool Calls | What Failed | Fix |
 |---|---|---|---|---|
-|  |  |  |  |  |
+| R10_missing_handle | `missing_info` | `timeline(screenname="sama", limit=5)` | Không rõ tài khoản nhưng agent tự chọn `sama` thay vì `clarify`. Nguyên nhân: prompt starter ra lệnh "pick a well-known account like Sam Altman". | v1 — bỏ chỉ dẫn đoán, thêm rule thiếu tài khoản → `clarify(response_type=text)` |
+| R11_missing_url | `missing_info` | `fetch(url="https://www.example.com/article")` | Không có URL nhưng agent bịa URL. Nguyên nhân: prompt starter ra lệnh "assume a likely URL and read it". | v1 — thiếu URL → `clarify(response_type=text)`, cấm bịa URL |
+| R12_confirm_before_send | `wrong_boundary` | `send(text="<UNKNOWN>", confirmed=false)` | Gọi `send` ngay, không xin xác nhận, nội dung còn rỗng. Nguyên nhân: prompt starter "just go ahead and do it". | v1 — gửi/đăng → `clarify(response_type=yes_no)` trước; `send(confirmed=true)` chỉ sau khi user đồng ý |
+| R03_web_news_routing | eval gán `wrong_tool`, mismatch thực tế `wrong_arg_value` | `lookup(query="tin tức AI nổi bật hôm nay", topic="news", timeframe="day")` | Tool, `topic`, `timeframe` đều đúng; chỉ `query` bị nhồi thêm "tin tức… hôm nay" (đã thể hiện qua `topic`/`timeframe`). | Convention arg: `query` chỉ là từ khóa chủ đề ngắn |
+| R13_parallel_web_and_tweets | eval gán `wrong_tool`, mismatch thực tế `wrong_arg_value` | `lookup(query="tin tức AI hôm nay", …)` + `social_search(query="AI")` | Gọi song song đúng 2 tool; `lookup.query` dài dòng như R03. | Như R03 |
+| M02_carryover_timeframe | `wrong_arg_value` | `lookup(query="robotics news today", topic="news", timeframe="day")` | Carry-over `topic`/`timeframe` qua lượt đã đúng; `query` thêm "news today". | Như R03 |
+
+Nhận xét: routing của model đã tốt ngay từ v0 (0.85); 3 lỗi đầu do **chỉ dẫn xấu cố ý trong system prompt**, 3 lỗi sau do **thiếu convention cho tham số `query`** trong tool declaration.
 
 ### B3. Team Eval Cases
 
