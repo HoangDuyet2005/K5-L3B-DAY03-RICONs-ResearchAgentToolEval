@@ -272,10 +272,28 @@ Chi tiết đóng góp của từng thành viên nằm trong [TEAM.md](../../TEA
 
 ## 7. Hạn chế và hướng cải thiện — B6. Reflection
 
-- Fix nào thuộc `system_prompt.md`?
-- Fix nào thuộc `tools.yaml`?
-- Failure nào cần review thủ công thay vì chấm tự động?
-- Nếu có thêm một vòng, nhóm sẽ thử giả thuyết nào?
+**Fix nào thuộc `system_prompt.md`?**
+Các lỗi về *hành vi* chung, áp dụng cho mọi tool: khi nào phải hỏi lại, khi nào phải xin xác nhận, phạm vi nhận việc.
+Bằng chứng: v1 chỉ sửa prompt và sửa được R10, R11 (hết đoán tài khoản/URL), routing tăng 0.85 → 1.00 ([run v1](../../starter_v0/runs/v1_B_base_openrouter_20261110T180926543698.json)).
+Ở R12, v1 cũng làm agent ngừng gọi `send(text="<UNKNOWN>")` như v0.
+
+**Fix nào thuộc `tools.yaml`?**
+Các lỗi về *giá trị tham số* và ranh giới giữa các tool gần giống nhau.
+Bằng chứng: v2 chỉ thêm một câu vào description của param `query` mà sửa được cả R03, R13 và M02 (multi turn), case accuracy 0.80 → 0.95 ([run v2](../../starter_v0/runs/v2_B_base_openrouter_20261110T181408218976.json)).
+Ranh giới giữa tool mới và tool sẵn có (`wiki` / `lookup` / `papers`, `github_repo` / `fetch`, `hn_search` / `social_search`, `hf_model` / `papers`) cũng nằm trong description của từng tool; trên Haiku, thêm 4 tool không gây regression ở 20 case base (`v3-wiki` và `v4-tools` đều 19/20, bằng v3).
+
+**Failure nào cần review thủ công thay vì chấm tự động?**
+
+- R12 (`confirm_before_send`): từ v1 đến v4-tools, agent hỏi nội dung bản tin (`clarify(text)`) thay vì xin xác nhận (`yes_no`). Vì user chưa đưa bản tin nào, hỏi nội dung là hành vi an toàn và có thể hợp lý hơn đáp án; chấm tự động vẫn tính FAIL.
+- R03 / R13: eval gán `wrong_tool` nhưng tool đúng, chỉ `query` dài dòng (B2). Phải đọc `actual_tool_calls` mới thấy.
+- Chất lượng câu trả lời cuối: eval chỉ chấm tool call, không chấm agent có bịa nội dung không. Ví dụ T1-4 (`fetch` lỗi, agent không bịa) và T1-5 (agent nói rõ `papers` không xếp theo độ phổ biến) chỉ kiểm được bằng đọc transcript.
+- Lỗi nhiều lượt có side effect: lỗi lịch sử hội thoại làm agent không bao giờ `send` (mục 5) không lộ ra trong eval, vì eval đưa sẵn lịch sử; chỉ chat live mới thấy.
+
+**Nếu có thêm một vòng, nhóm sẽ thử giả thuyết nào?**
+
+- v5 (prompt): thêm rule "yêu cầu gửi/đăng mà chưa có nội dung → tra/soạn trước, rồi `clarify(yes_no)` kèm nội dung; không gọi `send` cùng lượt với tool tra cứu". Đo trên R12 và G10 (G10 FAIL trên `gpt-4.1-nano` ở cả v0 lẫn v3).
+- Tách v3 thành hai version (description "dùng / không dùng" và convention args) để biết phần nào sửa G07 trên nano và phần nào làm G03 FAIL.
+- Chạy base eval trên `gpt-4.1-nano` để kiểm tra prompt tối ưu trên Haiku có chuyển sang model yếu hơn không (B3 cho thấy là chưa).
 
 ## 8. Tài liệu tham khảo
 
