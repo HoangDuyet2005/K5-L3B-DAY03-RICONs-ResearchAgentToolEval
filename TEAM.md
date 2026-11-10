@@ -14,7 +14,7 @@
 | STT | Họ tên | MSSV | Email | GitHub | Vai trò |
 | --: | ------ | ---- | ----- | ------ | ------- |
 |   1 | _(Người A)_ | | | HoangDuyet2005 | Nhóm trưởng — Setup, baseline v0, tối ưu prompt/tool declaration v1–v3, failure analysis |
-|   2 | _(Người B)_ | | | | Tool mới + unit test, 10 eval case nhóm, UI Streamlit + live chat, Phần A báo cáo |
+|   2 | Lưu Nguyễn Chí Đức | 2A202603923 | | TheDLCrimson | Tool mới + unit test, 10 eval case nhóm, UI Streamlit + live chat, Phần A báo cáo |
 
 ## Nguyên tắc phối hợp
 
@@ -44,7 +44,7 @@ Bonus (chỉ làm khi phần bắt buộc đã xong): Người A — test challe
 Mỗi thành viên có báo cáo riêng trong `report/team/` theo dạng `MSSV_HoTen.md`:
 
 - Người A: `report/team/MSSV_HoTen_NguoiA.md` → đổi tên thành `<MSSV>_<HoTen>.md`
-- Người B: `report/team/MSSV_HoTen_NguoiB.md` → đổi tên thành `<MSSV>_<HoTen>.md`
+- Người B: [`report/team/2A202603923_LuuNguyenChiDuc.md`](report/team/2A202603923_LuuNguyenChiDuc.md)
 
 ## Người A — HoVaTen-MSSV
 
@@ -63,7 +63,7 @@ Mỗi thành viên có báo cáo riêng trong `report/team/` theo dạng `MSSV_H
 
 - _(link commit/PR, `starter_v0/runs/<file>.json`, dòng trong `version_log.csv`)_
 
-## Người B — HoVaTen-MSSV
+## Người B - LuuNguyenChiDuc-2A202603923
 
 ### Phần việc phụ trách
 
