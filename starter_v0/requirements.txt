@@ -7,6 +7,6 @@ requests>=2.31.0
 PyYAML>=6.0
 pypdf>=4.0.0
 # Tool unit tests:
-pytest>=8.0.0
+pytest>=8.0.0,<9  # pytest 9.2.0 crashes with INTERNALERROR on Python 3.10
 # UI (Streamlit app.py):
 streamlit>=1.40

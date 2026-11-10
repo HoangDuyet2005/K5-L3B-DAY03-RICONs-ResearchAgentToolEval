@@ -13,7 +13,7 @@
 
 | STT | Họ tên | MSSV | Email | GitHub | Vai trò |
 | --: | ------ | ---- | ----- | ------ | ------- |
-|   1 | _(Người A)_ | | | HoangDuyet2005 | Nhóm trưởng — Setup, baseline v0, tối ưu prompt/tool declaration v1–v3, failure analysis |
+|   1 | Hoàng Thế Duyệt | 2A202603980 | | HoangDuyet2005 | Nhóm trưởng — Setup, baseline v0, tối ưu prompt/tool declaration v1–v3, failure analysis |
 |   2 | Lưu Nguyễn Chí Đức | 2A202603923 | | TheDLCrimson | Tool mới + unit test, 10 eval case nhóm, UI Streamlit + live chat, Phần A báo cáo |
 
 ## Nguyên tắc phối hợp
@@ -43,10 +43,10 @@ Bonus (chỉ làm khi phần bắt buộc đã xong): Người A — test challe
 
 Mỗi thành viên có báo cáo riêng trong `report/team/` theo dạng `MSSV_HoTen.md`:
 
-- Người A: `report/team/MSSV_HoTen_NguoiA.md` → đổi tên thành `<MSSV>_<HoTen>.md`
+- Người A: [`report/team/2A202603980_HoangTheDuyet.md`](report/team/2A202603980_HoangTheDuyet.md)
 - Người B: [`report/team/2A202603923_LuuNguyenChiDuc.md`](report/team/2A202603923_LuuNguyenChiDuc.md)
 
-## Người A — HoVaTen-MSSV
+## Người A — HoangTheDuyet-2A202603980
 
 ### Phần việc phụ trách
 
@@ -57,11 +57,16 @@ Mỗi thành viên có báo cáo riêng trong `report/team/` theo dạng `MSSV_H
 
 ### Đóng góp cụ thể
 
-- _(điền sau khi làm: version nào, giả thuyết gì, metric trước/sau)_
+- v0 (baseline, `anthropic/claude-haiku-5.5`): case_accuracy 0.70; phân tích 6 case FAIL thành 2 nhóm (chỉ dẫn xấu trong prompt; `query` dài dòng) — bảng B2.
+- v1 (`system_prompt.md`): bỏ chỉ dẫn đoán/gửi ngay, thêm rule phạm vi / `clarify` / xác nhận trước `send` → 0.70 → 0.80, routing 0.85 → 1.00.
+- v2 (`tools.yaml`, param `query`): `query` chỉ là từ khóa chủ đề ngắn → 0.80 → 0.95, multiturn 0.8333 → 1.00.
+- v3 (`tools.yaml`): viết lại description mọi tool (khi nào dùng / không dùng), boundary `send`, convention args → 0.95 → 0.95, không regression; R12 vẫn FAIL (phân tích ở B1/B6).
+- Sửa lỗi môi trường: pin `pytest<9` vì pytest 9.2.0 lỗi INTERNALERROR trên Python 3.10.
 
 ### Bằng chứng
 
-- _(link commit/PR, `starter_v0/runs/<file>.json`, dòng trong `version_log.csv`)_
+- Commit trên `main`: `2e1a51b` (pytest), `3b0e51d` (v0), `1e32f57` (v1), `bf38c61` (v2), `e63ad79` (v3).
+- Run: `starter_v0/runs/v{0,1,2,3}_B_base_openrouter_*.json`; 4 dòng v0–v3 trong `starter_v0/artifacts/version_log.csv`.
 
 ## Người B - LuuNguyenChiDuc-2A202603923
 
