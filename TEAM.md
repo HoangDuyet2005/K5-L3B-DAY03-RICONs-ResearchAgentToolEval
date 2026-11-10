@@ -72,15 +72,24 @@ Mỗi thành viên có báo cáo riêng trong `report/team/` theo dạng `MSSV_H
 
 ### Phần việc phụ trách
 
-- Tool mới `starter_v0/tools/<tên>/` + unit test (C4).
+- Tool mới `starter_v0/tools/wiki/` + unit test (C4).
 - 10 eval case nhóm trong `starter_v0/data/eval_group.json` + run `--suite group` (C5).
 - UI Streamlit, link dùng thử, live chat transcript (C6).
 - Báo cáo nhóm Phần A và mục B3, B4, B5a.
 
 ### Đóng góp cụ thể
 
-- _(điền sau khi làm: tool gì, test gì, case nào bắt được lỗi gì)_
+- Tool mới `wiki` (tra Wikipedia `vi`/`en`, không cần API key, trả error dict thay vì raise) + 7 unit test offline; khai báo `wiki` ở cuối `tools.yaml` theo mẫu description v3.
+- 10 case eval nhóm (5 single + 5 multi turn, 6 case route tới `wiki`); run group trên v0 và v3 (Haiku 10/10), run cross trên `gpt-4.1-nano` (6/10) để chứng minh bộ case bắt được lỗi.
+- Run base `v3-wiki` (0.95, không regression so với v3) và dòng `v3-wiki` trong `version_log.csv`.
+- UI Streamlit `starter_v0/app.py` (hiện mọi tool call và lỗi, ghi transcript); sửa lỗi lịch sử hội thoại làm agent không bao giờ gửi được Telegram sau khi user xác nhận.
+- Bonus: gửi Telegram thật sau xác nhận (transcript T3 ở B4).
+- `.gitattributes` giữ artifact ở LF để `prompt_hash`/`tools_hash` giống nhau trên mọi máy.
+- Báo cáo nhóm: Phần A, B3, B4, B5a, dòng Telegram ở B5, mục 3, mục 5, mục 8.
 
 ### Bằng chứng
 
-- _(link commit/PR, output `pytest`, run group, `starter_v0/transcripts/<file>.transcript.json`)_
+- PR [#1](https://github.com/HoangDuyet2005/K5-L3B-DAY03-RICONs-ResearchAgentToolEval/pull/1), commit `2c00871` (tool `wiki` + test), `1cdfc92` (eval nhóm), `69874d4` (UI + Phần A), `8c9eac2` (run v3-wiki, `.gitattributes`), `cb88930` (sửa lịch sử hội thoại, B4, Telegram).
+- `pytest`: 74 passed, 0 failed, 14 skipped (stub của tool có sẵn).
+- Run: `starter_v0/runs/v3-wiki_B_group_openrouter_20261110T185942635818.json`, `starter_v0/runs/v3-wiki_B_base_openrouter_20261110T190031395023.json`.
+- Transcript: `starter_v0/transcripts/ui_streamlit_openrouter_20261110T193835828410.transcript.json` (gửi Telegram) và 3 transcript khác liệt kê ở B4.
