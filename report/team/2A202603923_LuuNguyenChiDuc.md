@@ -49,10 +49,25 @@
 - Output `pytest`: `74 passed, 14 skipped` (0 failed; 14 skipped là stub của tool có sẵn, không phải test của `wiki`).
 - Run group JSON (`provider_error_cases == 0`, `measured_cases == total_cases`): [`v0-wiki_B_group_…181343247036.json`](../../starter_v0/runs/v0-wiki_B_group_openrouter_20261110T181343247036.json), [`v3-wiki_B_group_…185942635818.json`](../../starter_v0/runs/v3-wiki_B_group_openrouter_20261110T185942635818.json), cùng 2 run cross trên nano (bảng B3).
 - Transcript: [`…193835828410.transcript.json`](../../starter_v0/transcripts/ui_streamlit_openrouter_20261110T193835828410.transcript.json) (gửi Telegram sau xác nhận), [`…191950185955.transcript.json`](../../starter_v0/transcripts/ui_streamlit_openrouter_20261110T191950185955.transcript.json) (thiếu tài khoản rồi bổ sung), [`…190837448475.transcript.json`](../../starter_v0/transcripts/ui_streamlit_openrouter_20261110T190837448475.transcript.json) (yêu cầu thường, tool lỗi), [`…192055287079.transcript.json`](../../starter_v0/transcripts/ui_streamlit_openrouter_20261110T192055287079.transcript.json) (lỗi trước khi sửa).
-- AI/công cụ đã dùng và cách tự kiểm tra kết quả:
+- AI/công cụ đã dùng và cách tự kiểm tra kết quả: mình dùng Claude Code (model Claude Opus 5.5) làm trợ lý lập trình, theo bốn kiểu việc:
+
+  | Kiểu việc | AI làm gì | Mình kiểm tra thế nào |
+  |---|---|---|
+  | Soạn (drafting) | Soạn code tool, unit test, UI Streamlit, eval case và phần báo cáo theo hướng mình chọn | Mình chọn phạm vi và phương án (tool nào, bonus nào, ai làm mục nào), đọc lại code và case trước khi commit, tự commit bằng tài khoản của mình |
+  | Phản biện, tìm lỗi (critique) | Đọc transcript khi agent không gửi Telegram dù đã xác nhận, chỉ ra nguyên nhân ở lịch sử hội thoại; chỉ ra khi bộ eval đạt 10/10 thì chưa chứng minh được gì | Mình tái hiện lỗi trên UI trước và sau khi sửa, và chạy cùng bộ case trên model yếu hơn để xem case có bắt được lỗi không |
+  | Tra cứu (research) | Kiểm tra dạng response thật của các API (Wikipedia, GitHub, Hacker News, Hugging Face), so giá và chất lượng gọi tool của các model rẻ | Mình chọn model dựa trên run base thật của 6 model, không theo cảm giác |
+  | Kiểm tra (checking) | Chạy `pytest`, chạy eval, đối chiếu hash và số liệu giữa `version_log.csv`, run JSON và báo cáo, kiểm tra link | Mình tự chat live trên UI (các transcript ở B4), xem bản tin xuất hiện thật trên Telegram channel, và chỉ ghi vào báo cáo số liệu có trong run JSON hoặc transcript |
 
 ## 5. Tự đánh giá
 
 - Điều làm tốt:
+  - Chứng minh bộ eval có giá trị: Haiku 5.5 qua cả 10 case nhóm ngay với prompt starter cố ý xấu, nên mình chạy cùng bộ case trên `gpt-4.1-nano`; ở v0, 4 case FAIL đúng loại lỗi đã thiết kế, nên kết quả 10/10 của Haiku là do model tốt chứ không phải do case dễ.
+  - Tool viết phòng thủ: cả 4 tool tự viết không bao giờ raise mà trả error dict, ép kiểu và kẹp input xấu từ model, và được đối chiếu với response thật của API trước khi viết test; tổng 20 unit test cho tool của nhóm.
+  - Test live bắt được lỗi thật: khi tự chat thử luồng đăng Telegram, agent không bao giờ gửi dù mình đã xác nhận nhiều lần; không eval case nào bắt được lỗi này. Mình tái hiện, sửa và kiểm tra lại trên UI.
 - Điều chưa làm được / sẽ làm khác:
+  - Lỗi lịch sử hội thoại mới chỉ được sửa trong UI; `chat.py` vẫn bỏ kết quả tool khỏi lịch sử vì không nằm trong danh sách file được sửa, nên chat bằng CLI vẫn gặp lỗi đó.
+  - Sẽ test live sớm hơn: lỗi nhiều lượt chỉ lộ ra sau khi đã chạy xong eval; nếu chat thử 3 lượt ngay khi UI chạy được thì đã phát hiện trước showdown.
 - Khác biệt giữa unit test (đo code tool) và eval (đo lựa chọn của model) mà mình rút ra:
+  - Unit test đo code của tool: model gọi `format(items=[chuỗi])` là đúng tool, đúng args nên eval vẫn PASS, nhưng tool crash; tương tự, `wiki` không sắp kết quả theo thứ hạng thì eval vẫn PASS mà user nhận bài kém liên quan nhất lên đầu. Chỉ unit test bắt được hai lỗi này.
+  - Eval đo lựa chọn của model: chọn tool nào, truyền args gì, có hỏi lại hay xin xác nhận không, điều unit test không thể đo.
+  - Có loại lỗi thứ ba mà cả hai đều không bắt: lỗi lịch sử hội thoại làm agent không gửi được Telegram nằm ở harness nhiều lượt, chỉ lộ ra khi test end-to-end với nhiều lượt chat thật.
