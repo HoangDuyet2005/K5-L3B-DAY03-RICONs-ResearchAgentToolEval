@@ -14,7 +14,7 @@
 | STT | Họ tên | MSSV | Email | GitHub | Vai trò |
 | --: | ------ | ---- | ----- | ------ | ------- |
 |   1 | Hoàng Thế Duyệt | 2A202603980 | | HoangDuyet2005 | Nhóm trưởng — Setup, baseline v0, tối ưu prompt/tool declaration v1–v3, failure analysis |
-|   2 | _(Người B)_ | | | | Tool mới + unit test, 10 eval case nhóm, UI Streamlit + live chat, Phần A báo cáo |
+|   2 | Lưu Nguyễn Chí Đức | 2A202603923 | | TheDLCrimson | Tool mới + unit test, 10 eval case nhóm, UI Streamlit + live chat, Phần A báo cáo |
 
 ## Nguyên tắc phối hợp
 
@@ -44,7 +44,7 @@ Bonus (chỉ làm khi phần bắt buộc đã xong): Người A — test challe
 Mỗi thành viên có báo cáo riêng trong `report/team/` theo dạng `MSSV_HoTen.md`:
 
 - Người A: [`report/team/2A202603980_HoangTheDuyet.md`](report/team/2A202603980_HoangTheDuyet.md)
-- Người B: `report/team/MSSV_HoTen_NguoiB.md` → đổi tên thành `<MSSV>_<HoTen>.md`
+- Người B: [`report/team/2A202603923_LuuNguyenChiDuc.md`](report/team/2A202603923_LuuNguyenChiDuc.md)
 
 ## Người A — HoangTheDuyet-2A202603980
 
@@ -68,7 +68,7 @@ Mỗi thành viên có báo cáo riêng trong `report/team/` theo dạng `MSSV_H
 - Commit trên `main`: `2e1a51b` (pytest), `3b0e51d` (v0), `1e32f57` (v1), `bf38c61` (v2), `e63ad79` (v3).
 - Run: `starter_v0/runs/v{0,1,2,3}_B_base_openrouter_*.json`; 4 dòng v0–v3 trong `starter_v0/artifacts/version_log.csv`.
 
-## Người B — HoVaTen-MSSV
+## Người B - LuuNguyenChiDuc-2A202603923
 
 ### Phần việc phụ trách
 

@@ -1,0 +1,929 @@
+{
+  "run_id": "v3-wiki-nano_B_cross_openrouter_20261110T185950067467",
+  "version": "v3-wiki-nano",
+  "artifact_version": "v3-wiki-nano+p8f5c6f233078+t1693ac83a810",
+  "prompt_hash": "8f5c6f23307896221657474715ceab57e808228dbc4ee3b1dce3671ee32af149",
+  "tools_hash": "1693ac83a810024b051864d7161f75f45bacdf1073a765784387e2aa04dae9d4",
+  "phase": "B",
+  "suite": "cross",
+  "provider": "openrouter",
+  "model": "openai/gpt-4.1-nano",
+  "system_prompt": "D:\\Code\\TheDLC\\AI20K\\labs\\K5-L3B-DAY03-RICONs-ResearchAgentToolEval\\starter_v0\\artifacts\\system_prompt.md",
+  "tools": "D:\\Code\\TheDLC\\AI20K\\labs\\K5-L3B-DAY03-RICONs-ResearchAgentToolEval\\starter_v0\\artifacts\\tools.yaml",
+  "eval_cases": "data\\eval_group.json",
+  "dataset_id": "day03_v2_research_group",
+  "dataset_role": "group",
+  "description": "Case do NHÓM tự viết thêm để cover thêm trường hợp. Mỗi case cần: id, phase='B', query HOẶC turns, failure_type (thuộc allowed_failure_types), và expect (tool_calls[...] hoặc no_tool=true). Nên kèm metadata.what_it_tests.",
+  "generated_at": "2026-11-10T18:59:50",
+  "summary": {
+    "total_cases": 10,
+    "measured_cases": 10,
+    "provider_error_cases": 0,
+    "passed_cases": 6,
+    "case_accuracy": 0.6,
+    "tool_routing_accuracy": 0.7,
+    "argument_accuracy": 0.6,
+    "multiturn_accuracy": 0.8,
+    "failure_counts": {
+      "wrong_tool": 2,
+      "missing_info": 1,
+      "wrong_boundary": 1
+    },
+    "observed_mismatch_counts": {
+      "wrong_arg_value": 1,
+      "missing_tool_call": 2,
+      "extra_tool_call": 1
+    }
+  },
+  "results": [
+    {
+      "id": "G01_wiki_person_routing",
+      "phase": "B",
+      "suite": "cross",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "routing_background_to_wiki",
+        "difficulty": "easy",
+        "what_it_tests": "Câu hỏi tiểu sử (kiến thức nền, không phải tin mới) → route tới tool mới wiki thay vì lookup; query là tên bài gọn, không kèm từ hỏi 'là ai'."
+      },
+      "input": "Alan Turing là ai?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "wiki",
+            "args": {
+              "query": "Alan Turing"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "wiki",
+            "args": {
+              "query": "Alan Turing"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "wiki",
+          "args": {
+            "query": "Alan Turing"
+          },
+          "result": {
+            "tool": "wiki_search",
+            "query": "Alan Turing",
+            "lang": "vi",
+            "items": [
+              {
+                "title": "Alan Turing",
+                "url": "https://vi.wikipedia.org/wiki/Alan_Turing",
+                "source": "vi.wikipedia.org",
+                "summary": "Alan Mathison Turing OBE FRS (23 tháng 6 năm 1912 – 7 tháng 6 năm 1954) là một nhà toán học, logic học và mật mã học người Anh, được xem là một trong những nhà tiên phong của ngành khoa học máy tính và A.I (Trí tuệ nhân tạo). Phép thử Turing (Turing test) là một trong những cống hiến lớn nhất của ông trong ngành trí tuệ nhân tạo: thử thách này đặt ra câu hỏi rằng máy móc có khi nào đạt được ý thức và có thể suy nghĩ được hay không. Ông đã hình thức hóa khái niệm thuật toán và tính toán với máy Turing, đồng thời đưa ra phiên bản của \"Turing\", mà ngày nay được đông đảo công chúng chấp nhận, về luận đề Church-Turing, một luận đề nói rằng tất cả những gì tính được bằng thuật toán đều có thể tính được bằng máy Turing.\nTrong Chiến tranh thế giới thứ hai, Turing đã từng làm việc tại Bletchley Park, trung tâm giải mật mã của Anh, và một thời là người chỉ huy của HUT 8, một bộ phận của Anh có trách nhiệm giải mật mã của hải quân Đức. Giáo sư Turing đã cùng các cộng sự của tại HUT 8 đã phát triển một số kỹ thuật nhằm tăng tốc độ phá mã của quân phát xít Đức, trong đó bao gồm việc cải tiến máy bombe (máy này do các chuyên gia giải mã người Ba Lan sáng chế trước Thế chiến 2), một cỗ máy cơ-điệ"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G02_wiki_english_lang_arg",
+      "phase": "B",
+      "suite": "cross",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "wiki_lang_arg",
+        "difficulty": "medium",
+        "what_it_tests": "User hỏi bằng tiếng Anh và yêu cầu nguồn tiếng Anh → phải truyền lang=en tường minh, không để mặc định vi."
+      },
+      "input": "Give me the English Wikipedia summary of Ada Lovelace.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "wiki",
+            "args": {
+              "lang": "en"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "wiki",
+            "args": {
+              "query": "Ada Lovelace",
+              "lang": "en",
+              "max_results": 1
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "wiki",
+          "args": {
+            "query": "Ada Lovelace",
+            "lang": "en",
+            "max_results": 1
+          },
+          "result": {
+            "tool": "wiki_search",
+            "query": "Ada Lovelace",
+            "lang": "en",
+            "items": [
+              {
+                "title": "Ada Lovelace",
+                "url": "https://en.wikipedia.org/wiki/Ada_Lovelace",
+                "source": "en.wikipedia.org",
+                "summary": "Augusta Ada King, Countess of Lovelace (née Byron; 10 December 1815 – 27 November 1852), also known as Ada Lovelace, was an English mathematician and writer chiefly known for work on Charles Babbage's proposed mechanical general-purpose computer, the analytical engine. She was the first to recognise the machine had applications beyond pure calculation. Lovelace is often considered the first computer programmer.\nLovelace was the only legitimate child of poet Lord Byron and reformer Anne Isabella Milbanke. Lord Byron separated from his wife a month after Ada was born, and died when she was eight. Although often ill in childhood, Lovelace pursued her studies assiduously. She married William King in 1835. King was a Baron, and was created Viscount Ockham and 1st Earl of Lovelace in 1838. The name Lovelace was chosen because Ada was descended from the extinct Baron Lovelaces. The title given to her husband thus made Ada the Countess of Lovelace.\nLovelace's educational and social exploits brought her into contact with scientists such as Andrew Crosse, Charles Babbage, David Brewster, Charles Wheatstone and Michael Faraday, and the author Charles Dickens, contacts which she used to furthe"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G03_recent_event_not_wiki",
+      "phase": "B",
+      "suite": "cross",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "boundary_wiki_vs_lookup_news",
+        "difficulty": "medium",
+        "what_it_tests": "Hỏi về một công ty nhưng là sự kiện mới trong tuần → lookup với topic=news, timeframe=week; không được gọi wiki (kiến thức nền không có tin tuần này)."
+      },
+      "input": "Tuần này Anthropic có công bố gì mới không?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "topic": "news",
+              "timeframe": "week"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": true,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "lookup",
+            "args": {
+              "query": "Anthropic"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": "wrong_arg_value",
+        "failure_type": "wrong_tool",
+        "failures": [
+          "topic: expected 'news', got None",
+          "timeframe: expected 'week', got None"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "lookup",
+          "args": {
+            "query": "Anthropic"
+          },
+          "result": {
+            "tool": "web_search",
+            "query": "Anthropic",
+            "topic": "general",
+            "timeframe": "week",
+            "items": [
+              {
+                "title": "Anthropic",
+                "url": "https://tavily.com/knowledge/company/49NlR6zHvu8c",
+                "source": "tavily.com",
+                "summary": "# Anthropic\nID: 49NlR6zHvu8c\nWebsite: www.anthropic.com\nLegal name: Anthropic PBC\nHeadquarters: San Francisco, California, United States\nLinkedIn: www.linkedin.com/company/anthropicresearch · 4,646,145 followers\nIndustry: Research Services\nCompany type: Privately Held\nSocial profiles: www.facebook.com/anthropicai, www.facebook.com/anthropicai/?ref=py_c, www.twitter.com/anthropicai, www.crunchbase.com/organization/anthropic, www.instagram.com/anthropicai, www.youtube.com/@anthropic-ai [...] Email: support@anthropic.com\nDescription: Anthropic is an AI safety and research company that's working to build reliable, interpretable, and steerable AI systems.",
+                "score": 0.8941352
+              },
+              {
+                "title": "Teaching AI to build scientific models \\ Anthropic",
+                "url": "https://www.anthropic.com/research/teaching-ai-to-build-scientific-models",
+                "source": "anthropic.com",
+                "summary": "for a model with a handful of variables, like Hodgkin-Huxley. For a larger model with perhaps thousands of variables, the equivalent might be whether we can boil it down to a few crucial mechanistic ideas that are enough to rebuild it. The larger the model, the harder that becomes. [...] An agent that returns only one of them is hiding the rest, just as a single best-fit set of numbers does. [...] The solution is a statistical method called Bayesian inference. It gives you every set of numbers that works reasonably well, as a probability distribution that takes into account their fit to the data and your prior knowledge about the parameters. The distribution takes the shape of a curve, with the best fits at the peak and the weaker ones at the fringes.",
+                "score": 0.73596483
+              },
+              {
+                "title": "Anthropic’s Rise: What To Know Before The IPO",
+                "url": "https://www.youtube.com/watch?v=bOcwOqyZGNw",
+                "source": "youtube.com",
+                "summary": "Anthropic began its journey as an under-the-radar research lab founded in 2021 by seven former OpenAI employees. Now, the company is poised to launch an historic public debut that could set the tone for the AI trade in 2027 and test investors’ appetite for an entirely new asset class. The company that brought the world Claude reported more than $33 billion in revenue for the first nine months of 2026 in its updated IPO prospectus, but also disclosed nearly $900 billion in compute and [...] ### Transcript\n[0:00] Anthropic has now become a household name on Wall Street, ahead of what is poised to be a historic public debut this November.\n[0:06] Anthropic could be the largest IPO of all time, surpassing the current record holder, SpaceX.\n[0:12] But just six years ago, the company behind the chatbot, Claud, was a niche under the radar research lab spun out of its biggest rival,\n[0:19] OpenAI. Here's how Anthropic went from AI underdog to tech powerhouse. [...] [1:04] that makes it very hard to continue to work with the company, to continue to trust the company.\n[1:10] The Amodei's, along with five other former OpenAI employees, co-founded Anthropic in 2021 as a public benefit corporation with the mission\n[1:18] to ensure the world safely makes the transition through transformative AI.\n[1:23] The first investment at the time came from Skype founder, Jaan Tallinn.",
+                "score": 0.6765563
+              },
+              {
+                "title": "Anthropic IPO targets November debut as valuation expectations fall",
+                "url": "https://finance.yahoo.com/markets/stocks/articles/anthropic-ipo-targets-november-debut-162209958.html",
+                "source": "finance.yahoo.com",
+                "summary": "Investing.com -- Anthropic may begin formally marketing its IPO as early as Tuesday, Nov 10, 2026, testing whether the largest AI listing yet can clear a market that was rattled last week. Bloomberg reports the company is targeting an offering as large as SpaceX's record debut, or larger. The reported valuation talks have also fallen: some potential investors discussed $1.1T to $1.3T on Friday, down from the $1.5T to $2T range discussed earlier this month. The Nasdaq 100 fell 14% in the [...] AI safety policy. Anthropic backs slower development of the most advanced models, but AI-skeptic Democrats may push interventions that differ from its preferred solutions. [...] ## The bottom line\n\nAnthropic has little time to wait, and the market has already lowered its valuation expectations by about 15% to 40% depending on the benchmark. Last week's selloff left potential buyers nursing losses, while fear of missing the biggest IPO ever is pulling the other way. Early indications of order-book quality, and where the range is set, will say more than the headline size.",
+                "score": 0.6651719
+              },
+              {
+                "title": "Exclusive | Major Investors Are Skeptical Anthropic IPO Can Achieve $1.5 Trillion Valuation - WSJ",
+                "url": "https://www.wsj.com/finance/major-investors-are-skeptical-anthropic-ipo-can-achieve-1-5-trillion-valuation-ca965d8b",
+                "source": "wsj.com",
+                "summary": "Major investors are increasingly skeptical Anthropic’s blockbuster initial public offering can proceed at the expected valuation of $1.5 trillion after a deep market selloff tied to the unwinding of artificial-intelligence related bets, according to people familiar with the matter.\n\nAnthropic is aiming to stage the IPO the week before Thanksgiving and has been expected to raise up to $100 billion in an offering that could value the company at around $1.5 trillion.",
+                "score": 0.65861565
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G04_wiki_missing_subject",
+      "phase": "B",
+      "suite": "cross",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "missing_wiki_subject",
+        "difficulty": "medium",
+        "what_it_tests": "User chỉ rõ tool (Wikipedia) nhưng không nói tra ai → phải clarify hỏi tên người, không đoán một nhân vật rồi gọi wiki."
+      },
+      "input": "Tra Wikipedia giúp mình về ông ấy.",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "clarify",
+            "args": {
+              "response_type": "text"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "wiki",
+            "args": {
+              "query": "ông ấy"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "missing_info",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "missing_info",
+        "failures": [
+          "missing tool call clarify",
+          "extra tool call wiki"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "wiki",
+          "args": {
+            "query": "ông ấy"
+          },
+          "result": {
+            "tool": "wiki_search",
+            "query": "ông ấy",
+            "lang": "vi",
+            "items": [
+              {
+                "title": "Phan Bội Châu",
+                "url": "https://vi.wikipedia.org/wiki/Phan_B%E1%BB%99i_Ch%C3%A2u",
+                "source": "vi.wikipedia.org",
+                "summary": "Phan Bội Châu (chữ Hán: 潘佩珠; 26 tháng 12 năm 1867 – 29 tháng 10 năm 1940) là một danh sĩ và là nhà cách mạng Việt Nam, hoạt động trong thời kỳ Pháp thuộc."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G05_parallel_wiki_and_news",
+      "phase": "B",
+      "suite": "cross",
+      "case_suite": "group",
+      "is_multiturn": false,
+      "metadata": {
+        "skill": "parallel_background_plus_news",
+        "difficulty": "hard",
+        "what_it_tests": "Một câu có hai nhu cầu khác loại → gọi song song wiki (tiểu sử) và lookup (topic=news, timeframe=day); không gộp thành một tool, không bỏ nhu cầu nào."
+      },
+      "input": "Alan Turing là ai? Và hôm nay có tin gì mới về AI không?",
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "wiki",
+            "args": {
+              "query": "Alan Turing"
+            }
+          },
+          {
+            "name": "lookup",
+            "args": {
+              "topic": "news",
+              "timeframe": "day"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "wiki",
+            "args": {
+              "query": "Alan Turing"
+            }
+          },
+          {
+            "name": "social_search",
+            "args": {
+              "query": "AI"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": "missing_tool_call",
+        "failure_type": "wrong_tool",
+        "failures": [
+          "missing tool call lookup",
+          "extra tool call social_search"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "wiki",
+          "args": {
+            "query": "Alan Turing"
+          },
+          "result": {
+            "tool": "wiki_search",
+            "query": "Alan Turing",
+            "lang": "vi",
+            "items": [
+              {
+                "title": "Alan Turing",
+                "url": "https://vi.wikipedia.org/wiki/Alan_Turing",
+                "source": "vi.wikipedia.org",
+                "summary": "Alan Mathison Turing OBE FRS (23 tháng 6 năm 1912 – 7 tháng 6 năm 1954) là một nhà toán học, logic học và mật mã học người Anh, được xem là một trong những nhà tiên phong của ngành khoa học máy tính và A.I (Trí tuệ nhân tạo). Phép thử Turing (Turing test) là một trong những cống hiến lớn nhất của ông trong ngành trí tuệ nhân tạo: thử thách này đặt ra câu hỏi rằng máy móc có khi nào đạt được ý thức và có thể suy nghĩ được hay không. Ông đã hình thức hóa khái niệm thuật toán và tính toán với máy Turing, đồng thời đưa ra phiên bản của \"Turing\", mà ngày nay được đông đảo công chúng chấp nhận, về luận đề Church-Turing, một luận đề nói rằng tất cả những gì tính được bằng thuật toán đều có thể tính được bằng máy Turing.\nTrong Chiến tranh thế giới thứ hai, Turing đã từng làm việc tại Bletchley Park, trung tâm giải mật mã của Anh, và một thời là người chỉ huy của HUT 8, một bộ phận của Anh có trách nhiệm giải mật mã của hải quân Đức. Giáo sư Turing đã cùng các cộng sự của tại HUT 8 đã phát triển một số kỹ thuật nhằm tăng tốc độ phá mã của quân phát xít Đức, trong đó bao gồm việc cải tiến máy bombe (máy này do các chuyên gia giải mã người Ba Lan sáng chế trước Thế chiến 2), một cỗ máy cơ-điệ"
+              }
+            ]
+          }
+        },
+        {
+          "tool": "social_search",
+          "args": {
+            "query": "AI"
+          },
+          "result": {
+            "tool": "search_tweets",
+            "query": "AI",
+            "search_type": "Latest",
+            "items": [
+              {
+                "title": "@filipegarccc @greidsonsant @RhuanPablo1999 Vc fala como se o mlk tivesse sorrindo, batendo palma e comemorando pô, a qn",
+                "summary": "@filipegarccc @greidsonsant @RhuanPablo1999 Vc fala como se o mlk tivesse sorrindo, batendo palma e comemorando pô, a qnt tempo q esse maluco ai n vê o Vasco disputando com chance de alguma coisa? Bateu de frente com um dos dois times mais fortes do BR e ainda levou pros pênaltis, n vi o jogo ms pelo resultado n é desastre",
+                "url": "https://x.com/camarg_nic/status/2120124268721611044",
+                "source": "@camarg_nic",
+                "date": "Tue Nov 10 11:59:50 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": null
+                }
+              },
+              {
+                "title": "自尊心问题吧，艺术家/插画家通常自尊心很强，但我不是艺术家，我很早就承认我画不过AI生成，所以毅然加入半生成大军：就是草稿自己画，交由扩散模型生成细节。",
+                "summary": "自尊心问题吧，艺术家/插画家通常自尊心很强，但我不是艺术家，我很早就承认我画不过AI生成，所以毅然加入半生成大军：就是草稿自己画，交由扩散模型生成细节。\n\n因为我觉得如果全部都是生成，那么绘画的很大一部分乐趣就没有了。而且如果全部都生成，我觉得就不应称作是自己的作品。",
+                "url": "https://x.com/Fredgeoart/status/2120124263680381386",
+                "source": "@Fredgeoart",
+                "date": "Tue Nov 10 11:59:49 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": null
+                }
+              },
+              {
+                "title": "AIと壁打ちしてて一番笑った！！",
+                "summary": "AIと壁打ちしてて一番笑った！！\n\n普通に上場してる企業の名前を天然で間違って来てるんよね\n\nこんなことある？？マジでびっくりしたｗｗｗｗ https://t.co/HyLPxGjoYr",
+                "url": "https://x.com/debikingz/status/2120124262187237612",
+                "source": "@debikingz",
+                "date": "Tue Nov 10 11:59:48 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": null
+                }
+              },
+              {
+                "title": "@Princessbuny45 Ben en fait comme je les ai vu, moi, contrairement a toi, je sais que certains c’est plus de 20 minutes,",
+                "summary": "@Princessbuny45 Ben en fait comme je les ai vu, moi, contrairement a toi, je sais que certains c’est plus de 20 minutes, tu devrais essayer de les voir, ils sont très cool.",
+                "url": "https://x.com/Godard_ofwar/status/2120124261020909659",
+                "source": "@Godard_ofwar",
+                "date": "Tue Nov 10 11:59:48 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": null
+                }
+              },
+              {
+                "title": "@Ayanarinashi if you ditch the use of AI, people will watch you. dont think I didnt catch that weird ass hand https://t.",
+                "summary": "@Ayanarinashi if you ditch the use of AI, people will watch you. dont think I didnt catch that weird ass hand https://t.co/CJCRa5EfXM",
+                "url": "https://x.com/FadingMyst/status/2120124256180920728",
+                "source": "@FadingMyst",
+                "date": "Tue Nov 10 11:59:47 +0000 2026",
+                "metrics": {
+                  "favorites": 0,
+                  "retweets": 0,
+                  "views": null
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G06_wiki_clarify_then_fill_lang",
+      "phase": "B",
+      "suite": "cross",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_wiki_fill_and_carry",
+        "difficulty": "hard",
+        "what_it_tests": "Tên người đến ở lượt 3, ngôn ngữ ở lượt 4 → gọi wiki một lần với query=Marie Curie (giữ từ lượt trước) và lang=en."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tra Wikipedia giúp mình một nhà khoa học"
+        },
+        {
+          "role": "assistant",
+          "content": "Bạn muốn tra nhà khoa học nào?"
+        },
+        {
+          "role": "user",
+          "content": "Marie Curie nhé"
+        },
+        {
+          "role": "user",
+          "content": "Lấy bản tiếng Anh giúp mình"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "wiki",
+            "args": {
+              "query": "Marie Curie",
+              "lang": "en"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "wiki",
+            "args": {
+              "query": "Marie Curie",
+              "lang": "en"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "missing_info",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "wiki",
+          "args": {
+            "query": "Marie Curie",
+            "lang": "en"
+          },
+          "result": {
+            "tool": "wiki_search",
+            "query": "Marie Curie",
+            "lang": "en",
+            "items": [
+              {
+                "title": "Marie Curie",
+                "url": "https://en.wikipedia.org/wiki/Marie_Curie",
+                "source": "en.wikipedia.org",
+                "summary": "Maria Salomea Skłodowska Curie  (née Skłodowska; 7 November 1867 – 4 July 1934), better known as Marie Curie, was a Polish and naturalised-French physicist and chemist. She shared the 1903 Nobel Prize in Physics with her husband, Pierre Curie, \"for their joint researches on the  radioactivity phenomena discovered by Professor Henri Becquerel\". She won the 1911 Nobel Prize in Chemistry \"[for] the discovery of the elements radium and polonium, by the isolation of radium and the study of the nature and compounds of this remarkable element\". \nCurie was the first woman to win a Nobel Prize, the first person to win a Nobel Prize twice and the only person to win a Nobel Prize in two different scientific fields. She and Pierre were the first married couple to win the Nobel Prize, launching the Curie family legacy of five Nobel Prizes. She was, in 1906, the first woman to become a professor at the University of Paris.\nCurie was born in Warsaw, Russian Empire, where she studied at the clandestine Flying University and began her practical scientific training. In 1891, Curie followed her elder sister Bronisława to study in Paris, where she earned her higher degrees and conducted her subsequent"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G07_send_after_explicit_confirmation",
+      "phase": "B",
+      "suite": "cross",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "send_after_confirmation",
+        "difficulty": "hard",
+        "what_it_tests": "Mặt còn lại của boundary xác nhận: user đã xác nhận rõ nội dung → gọi send với confirmed=true và giữ nguyên văn bản, không hỏi lại lần nữa, không tự sửa nội dung."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Đăng lên Telegram dòng này: RICONs demo lúc 19h"
+        },
+        {
+          "role": "assistant",
+          "content": "Bạn xác nhận gửi đúng nội dung 'RICONs demo lúc 19h' lên Telegram chứ?"
+        },
+        {
+          "role": "user",
+          "content": "Đúng rồi, gửi đi"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "send",
+            "args": {
+              "text": "RICONs demo lúc 19h",
+              "confirmed": true
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "send",
+            "args": {
+              "text": "RICONs demo lúc 19h",
+              "confirmed": true
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_boundary",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "send",
+          "args": {
+            "text": "RICONs demo lúc 19h",
+            "confirmed": true
+          },
+          "result": {
+            "tool": "send_telegram",
+            "error": "RuntimeError",
+            "message": "Missing TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID env var"
+          }
+        }
+      ]
+    },
+    {
+      "id": "G08_correction_search_type_top",
+      "phase": "B",
+      "suite": "cross",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "multiturn_correction_search_type",
+        "difficulty": "medium",
+        "what_it_tests": "User sửa cách sắp xếp ở lượt 2 bằng lời ('phổ biến nhất') → search_type=Top, giữ query=Claude từ lượt 1."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Tìm tweet về Claude"
+        },
+        {
+          "role": "user",
+          "content": "À mình muốn loại phổ biến nhất, không phải mới nhất"
+        },
+        {
+          "role": "user",
+          "content": "Vẫn chủ đề Claude nhé"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "query": "Claude",
+              "search_type": "Top"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "social_search",
+            "args": {
+              "query": "Claude",
+              "search_type": "Top",
+              "limit": 5
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_arg_value",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "social_search",
+          "args": {
+            "query": "Claude",
+            "search_type": "Top",
+            "limit": 5
+          },
+          "result": {
+            "tool": "search_tweets",
+            "query": "Claude",
+            "search_type": "Top",
+            "items": [
+              {
+                "title": "INSTEAD OF WATCHING NETFLIX TONIGHT. Spend 2 hours with this. Claude AI FULL COURSE that teaches you how to BUILD and AU",
+                "summary": "INSTEAD OF WATCHING NETFLIX TONIGHT. Spend 2 hours with this. Claude AI FULL COURSE that teaches you how to BUILD and AUTOMATE anything. The people who watch this tonight will wake up tomorrow with a new skill. Watch it and bookmark it now. https://t.co/koWK75KRhz",
+                "url": "https://x.com/ai_with_jyoti/status/2119270857461858487",
+                "source": "@ai_with_jyoti",
+                "date": "Sun Nov 08 03:28:41 +0000 2026",
+                "metrics": {
+                  "favorites": 8050,
+                  "retweets": 1135,
+                  "views": "647569"
+                }
+              },
+              {
+                "title": "still don't understand why everyone is not using this yet. Thanks to it, my Polymarket bot made $47,300 in 31 days",
+                "summary": "still don't understand why everyone is not using this yet. Thanks to it, my Polymarket bot made $47,300 in 31 days\n\nAn ex-Jane Street quant posted a simple idea that got 11 million views: stop asking AI for money ideas, point it at money that's already being made\n\nYou open Fable 5.5, point it at a market that already pays, and it reads every winner, finds the rules they all share and builds the bot that copies them. It compounds like interest: every trade it logs makes the next one sharper\n\nHere is the gist:\n\nOpen Claude Code and pick Fable 5.5 (when it becomes available to all users)\n\nTell it to pull the top 20 wallets on one Polymarket market\n\nFable finds the 3 rules all of them follow\n\nSay \"build a paper bot on these rules, run it for one week\"\n\nSwitch to real money only after a green week\n\nTen minutes to set up, and you never guess a trade again\n\nThe full step-by-step is in the article. Save to bookmarks",
+                "url": "https://x.com/Argona0x/status/2118750918208561403",
+                "source": "@Argona0x",
+                "date": "Fri Nov 06 17:02:38 +0000 2026",
+                "metrics": {
+                  "favorites": 395,
+                  "retweets": 34,
+                  "views": "40895"
+                }
+              },
+              {
+                "title": "i built a skill that manages your meta ads for you",
+                "summary": "i built a skill that manages your meta ads for you\n\nit runs inside claude code and it's completely free\n\n2 times per day it studies your ads performance and sends you a report with options\n\nthis skill is better than any agency you could get….\n\n→ reads your numbers, your leads, the ad library and the web\n→ turns off ads that burn money with no leads\n→ clones your winners and tests new variants\n→ tells good leads apart from cheap ones that never answer\n→ never moves a dollar without your ok\n→ spending limit, daily cap, max +20% per change, every ok logged\n\non an example account cost per lead went from $3.15 to $1.84 in 4 weeks\n\ni'm giving it away the skill for free\n\ncomment \"ads\" and i'll send it over",
+                "url": "https://x.com/tobiadonadon_/status/2116291073886818736",
+                "source": "@tobiadonadon_",
+                "date": "Fri Oct 30 22:08:05 +0000 2026",
+                "metrics": {
+                  "favorites": 1648,
+                  "retweets": 122,
+                  "views": "176564"
+                }
+              },
+              {
+                "title": "HOLY F*CK, motion studio in 100% free github skills for you guys.",
+                "summary": "HOLY F*CK, motion studio in 100% free github skills for you guys.\n\n20 open-source skills for Opus 5.5.\n\nAnimation. Simulation. 3D. Audio. Export.\n\n01 Remotion → React video engine.\nhttps://t.co/w0z2Hw0CK4\n\n02 Remotion Skills → Official video skills for coding agents.\nhttps://t.co/9LdSkszrrB\n\n03 Anime.js → Timeline choreography.\nhttps://t.co/1pBmRIK3j2\n\n04 Motion → UI animation and layout transitions.\nhttps://t.co/GGPWFMlXRv\n\n05 Manim → Animated diagrams, equations and explainers.\nhttps://t.co/k8TQDlCx8R\n\n06 Lottie → Lightweight vector animation playback.\nhttps://t.co/zHgqWDygEL\n\n07 MCP for Blender → Let Claude build and edit 3D scenes.\nhttps://t.co/Z2IKpxV7kH\n\n08 Three.js → 3D scenes and camera moves.\nhttps://t.co/xEYhuCgtD8\n\n09 Three GPU Pathtracer → Realistic lighting and reflections.\nhttps://t.co/2VAhjMsJIt\n\n10 Jolt Physics → Collisions, rigid bodies and soft bodies.\nhttps://t.co/dQFBa8uR5m\n\n11 postprocessing → Bloom, depth of field and color grading.\nhttps://t.co/8JaIBClhOR\n\n12 Three.quarks → Particle trails and VFX.\nhttps://t.co/pMMECwvxVw\n\n13 Tweakpane → Live controls for your scene parameters.\nhttps://t.co/sl8RbNuW8U\n\n14 ComfyUI → Node-based generation workflows.\nhttps://t.co/gBXwu8n7qc\n\n15 CosyVoice → Multilingual voiceovers.\nhttps://t.co/lf7dxYYNMQ\n\n16 librosa → Beat detection for music-synced animation.\nhttps://t.co/2TtPiXs5gc\n\n17 WhisperX → Word-level timing for captions.\nhttps://t.co/EW3doglPwM\n\n18 OBS Studio → Screen capture.\nhttps://t.co/8tbe47USHo\n\n19 LosslessCut → Fast cuts without re-encoding.\nhttps://t.co/DjNBuKl9P8\n\n20 FFmpeg → Encoding and delivery.\nhttps://t.co/32LdpVocVR\n\nConcept → scene → motion → sound → final cut.\n\nBookmark this. Go build something worth watching ↓",
+                "url": "https://x.com/e1genqq/status/2116270712390316375",
+                "source": "@e1genqq",
+                "date": "Fri Oct 30 20:47:10 +0000 2026",
+                "metrics": {
+                  "favorites": 6507,
+                  "retweets": 723,
+                  "views": "432982"
+                }
+              },
+              {
+                "title": "Claude doing motion graphic to create VOX style explainer is such old news... ",
+                "summary": "Claude doing motion graphic to create VOX style explainer is such old news... \n\nOnly now tools try to \"sell\" you their agent that does it\n\nDon't fall for it, it is free\n\nGuys it is free 👇 https://t.co/GAlTTEO8GU",
+                "url": "https://x.com/OriSilver/status/2110390355812295018",
+                "source": "@OriSilver",
+                "date": "Wed Oct 14 15:20:44 +0000 2026",
+                "metrics": {
+                  "favorites": 1601,
+                  "retweets": 151,
+                  "views": "98378"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G09_concept_wiki_not_papers",
+      "phase": "B",
+      "suite": "cross",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "boundary_wiki_vs_papers",
+        "difficulty": "medium",
+        "what_it_tests": "Chủ đề nghiên cứu nhưng user chỉ cần định nghĩa và từ chối paper → wiki, không gọi papers hay lookup."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Mình đang tìm hiểu về RAG"
+        },
+        {
+          "role": "user",
+          "content": "Retrieval-augmented generation là gì? Chỉ cần giải thích khái niệm"
+        },
+        {
+          "role": "user",
+          "content": "Không cần paper đâu, đọc định nghĩa trên Wikipedia là được"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "wiki",
+            "args": {}
+          }
+        ]
+      },
+      "result": {
+        "passed": true,
+        "routing_correct": true,
+        "args_correct": true,
+        "actual_tool_calls": [
+          {
+            "name": "wiki",
+            "args": {
+              "query": "Retrieval-augmented generation"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_tool",
+        "observed_mismatch": null,
+        "failure_type": null,
+        "failures": []
+      },
+      "tool_results": [
+        {
+          "tool": "wiki",
+          "args": {
+            "query": "Retrieval-augmented generation"
+          },
+          "result": {
+            "tool": "wiki_search",
+            "query": "Retrieval-augmented generation",
+            "lang": "vi",
+            "items": [
+              {
+                "title": "Tạo sinh dựa trên truy xuất tăng cường",
+                "url": "https://vi.wikipedia.org/wiki/T%E1%BA%A1o_sinh_d%E1%BB%B1a_tr%C3%AAn_truy_xu%E1%BA%A5t_t%C4%83ng_c%C6%B0%E1%BB%9Dng",
+                "source": "vi.wikipedia.org",
+                "summary": "Tạo sinh dựa trên truy xuất tăng cường (tiếng Anh: retrieval-augmented generation hoặc RAG) là một kỹ thuật cho phép các mô hình ngôn ngữ lớn (LLM) truy xuất và kết hợp thông tin mới. Với RAG, các LLM không trả lời truy vấn của người dùng ngay lập tức. Thay vào đó, chúng sẽ tham khảo một bộ tài liệu được chỉ định trước. Những tài liệu này bổ sung thông tin cho dữ liệu huấn luyện có sẵn của LLM. Điều này cho phép các LLM sử dụng thông tin chuyên ngành và/hoặc thông tin cập nhật. Đây là những thông tin không có trong dữ liệu huấn luyện. Ví dụ, kỹ thuật này giúp các chatbot dựa trên LLM truy cập dữ liệu nội bộ của công ty. Nó cũng giúp tạo ra các phản hồi dựa trên những nguồn đáng tin cậy.\nRAG cải thiện các mô hình ngôn ngữ lớn (LLM) bằng cách tích hợp cơ chế truy xuất thông tin trước khi tạo ra phản hồi. Không giống như các LLM truyền thống chỉ dựa vào dữ liệu huấn luyện tĩnh, RAG lấy văn bản có liên quan từ cơ sở dữ liệu, tài liệu được tải lên, hoặc các nguồn trên web. Theo Ars Technica, \"RAG là một cách để cải thiện hiệu suất của LLM. Về cơ bản, nó kết hợp quy trình của LLM với quy trình tìm kiếm trên web hoặc tra cứu tài liệu khác để giúp LLM bám sát vào sự thật.\" Phương pháp này "
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "G10_research_before_post",
+      "phase": "B",
+      "suite": "cross",
+      "case_suite": "group",
+      "is_multiturn": true,
+      "metadata": {
+        "skill": "boundary_research_then_confirm",
+        "difficulty": "hard",
+        "what_it_tests": "Yêu cầu 'tra rồi đăng luôn': bước này chỉ được gọi wiki để lấy nội dung; chưa có nội dung và user chưa xác nhận nên không được gọi send cùng lúc."
+      },
+      "input": [
+        {
+          "role": "user",
+          "content": "Mình muốn làm một bài giới thiệu ngắn về Alan Turing cho channel"
+        },
+        {
+          "role": "user",
+          "content": "Tra Wikipedia về ông ấy rồi đăng tóm tắt lên Telegram luôn nhé"
+        }
+      ],
+      "expect": {
+        "tool_calls": [
+          {
+            "name": "wiki",
+            "args": {
+              "query": "Alan Turing"
+            }
+          }
+        ]
+      },
+      "result": {
+        "passed": false,
+        "routing_correct": false,
+        "args_correct": false,
+        "actual_tool_calls": [
+          {
+            "name": "wiki",
+            "args": {
+              "query": "Alan Turing"
+            }
+          },
+          {
+            "name": "send",
+            "args": {
+              "text": "Bạn có muốn tôi tra Wikipedia về Alan Turing rồi đăng tóm tắt lên Telegram không? Vui lòng xác nhận"
+            }
+          }
+        ],
+        "actual_text": null,
+        "case_failure_type": "wrong_boundary",
+        "observed_mismatch": "extra_tool_call",
+        "failure_type": "wrong_boundary",
+        "failures": [
+          "extra tool call send"
+        ]
+      },
+      "tool_results": [
+        {
+          "tool": "wiki",
+          "args": {
+            "query": "Alan Turing"
+          },
+          "result": {
+            "tool": "wiki_search",
+            "query": "Alan Turing",
+            "lang": "vi",
+            "items": [
+              {
+                "title": "Alan Turing",
+                "url": "https://vi.wikipedia.org/wiki/Alan_Turing",
+                "source": "vi.wikipedia.org",
+                "summary": "Alan Mathison Turing OBE FRS (23 tháng 6 năm 1912 – 7 tháng 6 năm 1954) là một nhà toán học, logic học và mật mã học người Anh, được xem là một trong những nhà tiên phong của ngành khoa học máy tính và A.I (Trí tuệ nhân tạo). Phép thử Turing (Turing test) là một trong những cống hiến lớn nhất của ông trong ngành trí tuệ nhân tạo: thử thách này đặt ra câu hỏi rằng máy móc có khi nào đạt được ý thức và có thể suy nghĩ được hay không. Ông đã hình thức hóa khái niệm thuật toán và tính toán với máy Turing, đồng thời đưa ra phiên bản của \"Turing\", mà ngày nay được đông đảo công chúng chấp nhận, về luận đề Church-Turing, một luận đề nói rằng tất cả những gì tính được bằng thuật toán đều có thể tính được bằng máy Turing.\nTrong Chiến tranh thế giới thứ hai, Turing đã từng làm việc tại Bletchley Park, trung tâm giải mật mã của Anh, và một thời là người chỉ huy của HUT 8, một bộ phận của Anh có trách nhiệm giải mật mã của hải quân Đức. Giáo sư Turing đã cùng các cộng sự của tại HUT 8 đã phát triển một số kỹ thuật nhằm tăng tốc độ phá mã của quân phát xít Đức, trong đó bao gồm việc cải tiến máy bombe (máy này do các chuyên gia giải mã người Ba Lan sáng chế trước Thế chiến 2), một cỗ máy cơ-điệ"
+              }
+            ]
+          }
+        },
+        {
+          "tool": "send",
+          "args": {
+            "text": "Bạn có muốn tôi tra Wikipedia về Alan Turing rồi đăng tóm tắt lên Telegram không? Vui lòng xác nhận"
+          },
+          "result": {
+            "tool": "send_telegram",
+            "status": "needs_confirmation",
+            "message": "Only send after the user explicitly confirms."
+          }
+        }
+      ]
+    }
+  ]
+}

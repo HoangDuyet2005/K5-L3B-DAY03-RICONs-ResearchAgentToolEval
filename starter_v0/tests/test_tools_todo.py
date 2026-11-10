@@ -110,13 +110,89 @@ def test_policy_instruction_like_lines_go_to_untrusted_text() -> None:
 #   2. bad / missing input from the model (empty string, wrong type, out-of-enum value)
 #   3. failure path (missing key, HTTP error, timeout) -> returns error dict, does not raise
 
-def test_my_new_tool_happy_path() -> None:
-    pytest.skip(TODO)
+# ---------------- wiki (team RICONs) ----------------
+
+WIKI_PAGES = {"query": {"pages": [
+    {"title": "Học máy", "index": 2, "extract": "Học máy là...", "fullurl": "https://vi.wikipedia.org/wiki/H%E1%BB%8Dc_m%C3%A1y"},
+    {"title": "Transformer (mô hình học máy)", "index": 1, "extract": "Transformer là một mô hình học sâu...",
+     "fullurl": "https://vi.wikipedia.org/wiki/Transformer"},
+]}}
 
 
-def test_my_new_tool_bad_input_from_model() -> None:
-    pytest.skip(TODO)
+def test_wiki_sends_one_search_request_and_maps_pages_by_rank(fake_http) -> None:
+    calls = fake_http(FakeResponse(WIKI_PAGES))
+    wiki = TOOL_FUNCTIONS["wiki"]
+
+    result = wiki(query="  Transformer ", lang="vi", max_results=2)
+
+    assert len(calls) == 1
+    assert calls[0]["method"] == "GET"
+    assert calls[0]["url"] == "https://vi.wikipedia.org/w/api.php"
+    assert calls[0]["params"]["gsrsearch"] == "Transformer"
+    assert calls[0]["params"]["gsrlimit"] == 2
+    assert calls[0]["headers"]["User-Agent"]
+    # Pages arrive unordered; the tool must sort them by search rank (`index`).
+    assert [item["title"] for item in result["items"]] == ["Transformer (mô hình học máy)", "Học máy"]
+    assert result["items"][0] == {
+        "title": "Transformer (mô hình học máy)", "url": "https://vi.wikipedia.org/wiki/Transformer",
+        "source": "vi.wikipedia.org", "summary": "Transformer là một mô hình học sâu...",
+    }
 
 
-def test_my_new_tool_failure_returns_error_dict() -> None:
-    pytest.skip(TODO)
+def test_wiki_empty_query_returns_error_without_request(fake_http) -> None:
+    calls = fake_http(FakeResponse(WIKI_PAGES))
+
+    result = TOOL_FUNCTIONS["wiki"](query="   ")
+
+    assert result["error"] == "ValueError"
+    assert "query" in result["message"]
+    assert calls == []
+
+
+def test_wiki_out_of_enum_lang_returns_error_without_request(fake_http) -> None:
+    calls = fake_http(FakeResponse(WIKI_PAGES))
+
+    result = TOOL_FUNCTIONS["wiki"](query="Hà Nội", lang="fr")
+
+    assert result["error"] == "ValueError"
+    assert "lang" in result["message"]
+    assert calls == []
+
+
+def test_wiki_coerces_string_count_and_clamps_it_to_1_to_5(fake_http) -> None:
+    calls = fake_http(FakeResponse({"query": {"pages": []}}))
+    wiki = TOOL_FUNCTIONS["wiki"]
+
+    wiki(query="AI", lang="EN", max_results="3")
+    wiki(query="AI", max_results=0)
+    wiki(query="AI", max_results=50)
+
+    assert calls[0]["url"] == "https://en.wikipedia.org/w/api.php"
+    assert [call["params"]["gsrlimit"] for call in calls] == [3, 1, 5]
+
+
+def test_wiki_no_match_returns_empty_items_not_error(fake_http) -> None:
+    fake_http(FakeResponse({"batchcomplete": True}))
+
+    result = TOOL_FUNCTIONS["wiki"](query="xyzzy-khong-co-bai-nao")
+
+    assert result["items"] == []
+    assert "error" not in result
+
+
+def test_wiki_http_error_returns_error_dict(fake_http) -> None:
+    fake_http(FakeResponse(status_code=429))
+
+    result = TOOL_FUNCTIONS["wiki"](query="AI")
+
+    assert result == {"tool": "wiki_search", "error": "HTTPError", "message": "HTTP 429"}
+
+
+def test_wiki_timeout_returns_error_dict(fake_http) -> None:
+    import requests
+
+    fake_http(requests.Timeout("read timed out"))
+
+    result = TOOL_FUNCTIONS["wiki"](query="AI")
+
+    assert result["error"] == "Timeout"

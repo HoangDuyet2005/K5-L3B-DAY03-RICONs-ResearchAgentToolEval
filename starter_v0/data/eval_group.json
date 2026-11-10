@@ -3,5 +3,159 @@
   "dataset_role": "group",
   "description": "Case do NHÓM tự viết thêm để cover thêm trường hợp. Mỗi case cần: id, phase='B', query HOẶC turns, failure_type (thuộc allowed_failure_types), và expect (tool_calls[...] hoặc no_tool=true). Nên kèm metadata.what_it_tests.",
   "allowed_failure_types": ["wrong_tool", "wrong_arg_value", "wrong_boundary", "unnecessary_tool", "out_of_scope", "missing_info"],
-  "cases": []
+  "cases": [
+    {
+      "id": "G01_wiki_person_routing",
+      "phase": "B",
+      "suite": "group",
+      "query": "Alan Turing là ai?",
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [{"name": "wiki", "args": {"query": "Alan Turing"}}]},
+      "metadata": {
+        "skill": "routing_background_to_wiki",
+        "difficulty": "easy",
+        "what_it_tests": "Câu hỏi tiểu sử (kiến thức nền, không phải tin mới) → route tới tool mới wiki thay vì lookup; query là tên bài gọn, không kèm từ hỏi 'là ai'."
+      }
+    },
+    {
+      "id": "G02_wiki_english_lang_arg",
+      "phase": "B",
+      "suite": "group",
+      "query": "Give me the English Wikipedia summary of Ada Lovelace.",
+      "failure_type": "wrong_arg_value",
+      "expect": {"tool_calls": [{"name": "wiki", "args": {"lang": "en"}}]},
+      "metadata": {
+        "skill": "wiki_lang_arg",
+        "difficulty": "medium",
+        "what_it_tests": "User hỏi bằng tiếng Anh và yêu cầu nguồn tiếng Anh → phải truyền lang=en tường minh, không để mặc định vi."
+      }
+    },
+    {
+      "id": "G03_recent_event_not_wiki",
+      "phase": "B",
+      "suite": "group",
+      "query": "Tuần này Anthropic có công bố gì mới không?",
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [{"name": "lookup", "args": {"topic": "news", "timeframe": "week"}}]},
+      "metadata": {
+        "skill": "boundary_wiki_vs_lookup_news",
+        "difficulty": "medium",
+        "what_it_tests": "Hỏi về một công ty nhưng là sự kiện mới trong tuần → lookup với topic=news, timeframe=week; không được gọi wiki (kiến thức nền không có tin tuần này)."
+      }
+    },
+    {
+      "id": "G04_wiki_missing_subject",
+      "phase": "B",
+      "suite": "group",
+      "query": "Tra Wikipedia giúp mình về ông ấy.",
+      "failure_type": "missing_info",
+      "expect": {"tool_calls": [{"name": "clarify", "args": {"response_type": "text"}}]},
+      "metadata": {
+        "skill": "missing_wiki_subject",
+        "difficulty": "medium",
+        "what_it_tests": "User chỉ rõ tool (Wikipedia) nhưng không nói tra ai → phải clarify hỏi tên người, không đoán một nhân vật rồi gọi wiki."
+      }
+    },
+    {
+      "id": "G05_parallel_wiki_and_news",
+      "phase": "B",
+      "suite": "group",
+      "query": "Alan Turing là ai? Và hôm nay có tin gì mới về AI không?",
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [
+        {"name": "wiki", "args": {"query": "Alan Turing"}},
+        {"name": "lookup", "args": {"topic": "news", "timeframe": "day"}}
+      ]},
+      "metadata": {
+        "skill": "parallel_background_plus_news",
+        "difficulty": "hard",
+        "what_it_tests": "Một câu có hai nhu cầu khác loại → gọi song song wiki (tiểu sử) và lookup (topic=news, timeframe=day); không gộp thành một tool, không bỏ nhu cầu nào."
+      }
+    },
+    {
+      "id": "G06_wiki_clarify_then_fill_lang",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {"role": "user", "content": "Tra Wikipedia giúp mình một nhà khoa học"},
+        {"role": "assistant", "content": "Bạn muốn tra nhà khoa học nào?"},
+        {"role": "user", "content": "Marie Curie nhé"},
+        {"role": "user", "content": "Lấy bản tiếng Anh giúp mình"}
+      ],
+      "failure_type": "missing_info",
+      "expect": {"tool_calls": [{"name": "wiki", "args": {"query": "Marie Curie", "lang": "en"}}]},
+      "metadata": {
+        "skill": "multiturn_wiki_fill_and_carry",
+        "difficulty": "hard",
+        "what_it_tests": "Tên người đến ở lượt 3, ngôn ngữ ở lượt 4 → gọi wiki một lần với query=Marie Curie (giữ từ lượt trước) và lang=en."
+      }
+    },
+    {
+      "id": "G07_send_after_explicit_confirmation",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {"role": "user", "content": "Đăng lên Telegram dòng này: RICONs demo lúc 19h"},
+        {"role": "assistant", "content": "Bạn xác nhận gửi đúng nội dung 'RICONs demo lúc 19h' lên Telegram chứ?"},
+        {"role": "user", "content": "Đúng rồi, gửi đi"}
+      ],
+      "failure_type": "wrong_boundary",
+      "expect": {"tool_calls": [{"name": "send", "args": {"text": "RICONs demo lúc 19h", "confirmed": true}}]},
+      "metadata": {
+        "skill": "send_after_confirmation",
+        "difficulty": "hard",
+        "what_it_tests": "Mặt còn lại của boundary xác nhận: user đã xác nhận rõ nội dung → gọi send với confirmed=true và giữ nguyên văn bản, không hỏi lại lần nữa, không tự sửa nội dung."
+      }
+    },
+    {
+      "id": "G08_correction_search_type_top",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {"role": "user", "content": "Tìm tweet về Claude"},
+        {"role": "user", "content": "À mình muốn loại phổ biến nhất, không phải mới nhất"},
+        {"role": "user", "content": "Vẫn chủ đề Claude nhé"}
+      ],
+      "failure_type": "wrong_arg_value",
+      "expect": {"tool_calls": [{"name": "social_search", "args": {"query": "Claude", "search_type": "Top"}}]},
+      "metadata": {
+        "skill": "multiturn_correction_search_type",
+        "difficulty": "medium",
+        "what_it_tests": "User sửa cách sắp xếp ở lượt 2 bằng lời ('phổ biến nhất') → search_type=Top, giữ query=Claude từ lượt 1."
+      }
+    },
+    {
+      "id": "G09_concept_wiki_not_papers",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {"role": "user", "content": "Mình đang tìm hiểu về RAG"},
+        {"role": "user", "content": "Retrieval-augmented generation là gì? Chỉ cần giải thích khái niệm"},
+        {"role": "user", "content": "Không cần paper đâu, đọc định nghĩa trên Wikipedia là được"}
+      ],
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [{"name": "wiki", "args": {}}]},
+      "metadata": {
+        "skill": "boundary_wiki_vs_papers",
+        "difficulty": "medium",
+        "what_it_tests": "Chủ đề nghiên cứu nhưng user chỉ cần định nghĩa và từ chối paper → wiki, không gọi papers hay lookup."
+      }
+    },
+    {
+      "id": "G10_research_before_post",
+      "phase": "B",
+      "suite": "group",
+      "turns": [
+        {"role": "user", "content": "Mình muốn làm một bài giới thiệu ngắn về Alan Turing cho channel"},
+        {"role": "user", "content": "Tra Wikipedia về ông ấy rồi đăng tóm tắt lên Telegram luôn nhé"}
+      ],
+      "failure_type": "wrong_boundary",
+      "expect": {"tool_calls": [{"name": "wiki", "args": {"query": "Alan Turing"}}]},
+      "metadata": {
+        "skill": "boundary_research_then_confirm",
+        "difficulty": "hard",
+        "what_it_tests": "Yêu cầu 'tra rồi đăng luôn': bước này chỉ được gọi wiki để lấy nội dung; chưa có nội dung và user chưa xác nhận nên không được gọi send cùng lúc."
+      }
+    }
+  ]
 }

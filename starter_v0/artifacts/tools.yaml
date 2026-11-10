@@ -149,3 +149,15 @@ tools:
       required: [arxiv_url]
 
   # ---------------- Group tools ----------------
+  - name: wiki
+    description: >-
+      Tra Wikipedia và trả về đoạn mở đầu của bài khớp nhất kèm link (kiến thức nền ổn định, không phải tin mới).
+      DÙNG khi: user hỏi định nghĩa một khái niệm ("X là gì"), tiểu sử một người ("X là ai"), hoặc lịch sử một tổ chức/công nghệ.
+      KHÔNG dùng khi: tin tức hoặc sự kiện mới (→ lookup với topic=news); bài đăng/tweet (→ timeline / social_search); user đã đưa URL cụ thể (→ fetch).
+    parameters:
+      type: object
+      properties:
+        query: {type: string, default: "", description: "Tên bài hoặc khái niệm cần tra, ngắn gọn, không kèm từ hỏi (vd. 'Alan Turing', không phải 'Alan Turing là ai')."}
+        lang: {type: string, enum: [vi, en], default: "vi", description: "Ngôn ngữ Wikipedia. Mặc định vi; dùng en khi user hỏi bằng tiếng Anh hoặc yêu cầu nguồn tiếng Anh."}
+        max_results: {type: integer, default: 1, description: "Số bài trả về, từ 1 đến 5. Mặc định 1; chỉ tăng khi user muốn so sánh nhiều bài."}
+      required: [query]

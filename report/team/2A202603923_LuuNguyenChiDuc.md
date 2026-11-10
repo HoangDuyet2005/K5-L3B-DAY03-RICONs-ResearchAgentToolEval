@@ -1,13 +1,10 @@
-# Báo cáo cá nhân — HoVaTen-MSSV (Người B — nhóm RICONs)
-
-> Đổi tên file thành `<MSSV>_<HoTen>.md` (ví dụ `20241234_NguyenVanAn.md`) và thay tiêu đề trước khi nộp.
+# Báo cáo cá nhân - LuuNguyenChiDuc-2A202603923 (Người B, nhóm RICONs)
 
 ## 1. Thông tin thành viên
 
-- Họ tên:
-- MSSV:
-- Email:
-- GitHub:
+- Họ tên: Lưu Nguyễn Chí Đức
+- MSSV: 2A202603923
+- GitHub: [TheDLCrimson](https://github.com/TheDLCrimson)
 - Vai trò: Tool mới + unit test, eval nhóm, UI + live chat
 
 ## 2. Phần việc phụ trách
