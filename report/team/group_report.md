@@ -8,45 +8,59 @@
 
 ## 1. Thông tin nhóm
 
-- Tên nhóm:
+- Tên nhóm: RICONs
 - Thành viên và phân công: xem [TEAM.md](../../TEAM.md)
-- Provider/model dùng cho v0–v3:
+- Provider/model dùng cho v0–v3: OpenRouter, `anthropic/claude-haiku-5.5` (`--provider openrouter --model anthropic/claude-haiku-5.5`), temperature 0
 
 ## 2. Mục tiêu và cách tiếp cận — PHẦN A: Giới thiệu agent
 
 ### A1. Agent này làm được gì
 
-> 1–2 câu mô tả agent dùng để làm gì (cho team khác hiểu nhanh).
-
-Ví dụ: "Research agent: tìm tin theo từ khóa / theo tài khoản, đọc URL, tổng hợp thành digest, và gửi lên Telegram khi được xác nhận."
+Research agent tiếng Việt: tra tin tức trên web, tra kiến thức nền trên Wikipedia, xem tweet theo tài khoản hoặc từ khóa, đọc một link, gom kết quả thành bản tin markdown, và chỉ đăng lên Telegram sau khi người dùng xác nhận nội dung.
+Thiếu thông tin (tài khoản nào, link nào, tra ai) thì agent hỏi lại thay vì đoán.
 
 **Cách chạy UI:**
 
-> Lệnh chạy UI (ví dụ `streamlit run app.py`) và dependency đã thêm vào `starter_v0/requirements.txt`.
+```bash
+cd starter_v0
+pip install -r requirements.txt      # đã thêm streamlit>=1.40
+streamlit run app.py                 # http://localhost:8501
+```
+
+UI ([`starter_v0/app.py`](../../starter_v0/app.py)) dùng chung vòng lặp tool và cách ghi transcript với `chat.py`.
+Mỗi câu trả lời hiện kèm tool call và kết quả thô của tool; tool lỗi (ví dụ thiếu API key) được mở sẵn và tô đỏ, không bị giấu.
+Mỗi phiên chat được ghi vào `starter_v0/transcripts/*.transcript.json` (`"source": "streamlit"`).
 
 **Link dùng thử (deploy):**
 
-> Dán link public để team khác mở thử ngay. Cách deploy nhanh bằng Cloudflare Tunnel xem README. Nếu deploy Vercel/Streamlit Cloud thì dán link đó.
->
-> URL:
+Cloudflare Tunnel trỏ vào UI đang chạy local: `cloudflared tunnel --url http://localhost:8501`.
+Link `trycloudflare.com` chỉ sống trong phiên chạy lệnh, nên được dán lại mỗi lần mở.
+
+URL:
 
 ### A2. Tool agent có
 
-> Liệt kê các tool agent đang dùng (gồm tool mới nhóm tự thêm). Mỗi tool 1 dòng: tên + làm được gì.
-
 | Tên tool | Làm được gì | Tool mới nhóm thêm? |
 |---|---|---|
-| clarify | hỏi lại người dùng khi thiếu thông tin | không |
-|  |  |  |
-|  |  |  |
+| clarify | Hỏi lại người dùng khi thiếu thông tin, hoặc xin xác nhận trước khi gửi | không |
+| timeline | Lấy bài đăng gần đây của một tài khoản X/Twitter (handle không có `@`) | không |
+| social_search | Tìm tweet theo từ khóa, sắp xếp `Latest` hoặc `Top` | không |
+| lookup | Tìm trên web (Tavily), `topic=news` cho tin tức, `timeframe` day/week/month/year | không |
+| fetch | Đọc nội dung một URL cụ thể (Firecrawl) | không |
+| format | Trình bày các item đã có thành bản tin markdown | không |
+| send | Đăng văn bản lên Telegram channel của nhóm, chỉ khi `confirmed=true` | không |
+| policy | Tìm trong company policy nội bộ | không |
+| papers | Tìm paper trên arXiv | không |
+| paper_text | Tải PDF arXiv và trích text | không |
+| wiki | Tra Wikipedia (`vi`/`en`): định nghĩa, tiểu sử, lịch sử; không cần API key | **có** |
 
 ### A3. Câu hỏi mẫu để thử
 
-> 3–5 câu hỏi/yêu cầu mẫu để team khác tự thử agent ngay.
-
-1.
-2.
-3.
+1. Alan Turing là ai? (tool mới `wiki`)
+2. Tin tức AI hôm nay có gì nổi bật? (`lookup` với tin hôm nay)
+3. Mọi người đang bàn gì về Claude trên Twitter? (`social_search`)
+4. Tóm tắt 5 tweet mới nhất giúp mình (thiếu tài khoản: agent phải hỏi lại)
+5. Đăng bản tin AI hôm nay lên Telegram giúp mình (agent phải xin xác nhận trước khi gửi)
 
 ## 3. Giải pháp
 
@@ -109,7 +123,7 @@ Lấy từ `starter_v0/transcripts/*.transcript.json`.
 |---|---|---|---|
 | Tool mới `wiki` | [`starter_v0/tools/wiki/`](../../starter_v0/tools/wiki/) (`tool.py`, `TOOL.md`), đăng ký trong [`tools/__init__.py`](../../starter_v0/tools/__init__.py) và cuối [`artifacts/tools.yaml`](../../starter_v0/artifacts/tools.yaml) | Một request MediaWiki (search + intro), không cần API key; `items` cùng dạng với `lookup` nên đưa thẳng vào `format` được; model route đúng tới `wiki` ở G01, G05, G06, G09, G10 | Input xấu (`query` rỗng, `lang` ngoài `vi`/`en`) trả error dict, không gọi mạng; `max_results` kẹp 1-5; tool chỉ đọc, không side effect |
 | Unit test tool mới (≥ 3 test/tool) | [`tests/test_tools_todo.py`](../../starter_v0/tests/test_tools_todo.py), 7 test `test_wiki_*`; `pytest`: 74 passed, 0 failed, 14 skipped (stub tool có sẵn) | Happy path (request + mapping), input xấu (query rỗng, lang ngoài enum, số dạng chuỗi), nhánh lỗi (HTTP 429, timeout) | Test chạy offline qua `fake_http`; mỗi test assert cả request gửi đi lẫn kết quả trả về |
-| UI (lệnh chạy + link dùng thử) |  |  |  |
+| UI (lệnh chạy + link dùng thử) | [`starter_v0/app.py`](../../starter_v0/app.py), `streamlit run app.py`, link ở mục A1 | Dùng chung `run_model_tool_loop` và `write_transcript` của `chat.py`; chat trên UI được ghi transcript cùng format; nút câu hỏi mẫu ở sidebar | Tool call và kết quả thô hiện dưới mỗi câu trả lời, lỗi tool được tô đỏ (không che lỗi); giới hạn 20 lượt mỗi phiên vì link public dùng key của nhóm |
 
 Tool unit tests: số test đã viết, và một ví dụ lỗi mà unit test bắt được nhưng eval không bắt được.
 
