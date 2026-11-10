@@ -79,9 +79,21 @@ Lấy từ `results[*].result.failures` trong run JSON.
 
 Liệt kê đúng 10 case trong `starter_v0/data/eval_group.json` (5 single turn + 5 multi turn).
 
-| Case ID | What It Tests | Expected Tool/Behavior | Result |
-|---|---|---|---|
-|  |  |  |  |
+Run `--suite group` (Haiku 5.5, prompt/tools v0 + khai báo `wiki`): [`v0-wiki_B_group_openrouter_20261110T181343247036.json`](../../starter_v0/runs/v0-wiki_B_group_openrouter_20261110T181343247036.json), 10/10 PASS, `provider_error_cases == 0`, `measured_cases == total_cases == 10`.
+Vì Haiku 5.5 qua hết cả với prompt starter cố ý xấu, nhóm chạy thêm cùng bộ case trên model yếu hơn (`openai/gpt-4.1-nano`, `--suite cross`) để kiểm tra bộ case có bắt được lỗi không: [`v0-wiki-nano_B_cross_openrouter_20261110T181423602495.json`](../../starter_v0/runs/v0-wiki-nano_B_cross_openrouter_20261110T181423602495.json), 6/10, và cả 4 case FAIL đều đúng loại lỗi case đó được viết để bắt.
+
+| Case ID | Turn | What It Tests | Expected Tool/Behavior | Result (Haiku v0+wiki / nano) |
+|---|---|---|---|---|
+| G01_wiki_person_routing | single | Câu hỏi tiểu sử route tới tool mới `wiki`, query gọn | `wiki(query="Alan Turing")` | PASS / PASS |
+| G02_wiki_english_lang_arg | single | Yêu cầu nguồn tiếng Anh phải truyền `lang=en` tường minh | `wiki(lang="en")` | PASS / PASS |
+| G03_recent_event_not_wiki | single | Sự kiện mới trong tuần đi `lookup`, không đi `wiki` | `lookup(topic="news", timeframe="week")` | PASS / PASS |
+| G04_wiki_missing_subject | single | Biết tool nhưng thiếu đối tượng thì phải hỏi lại | `clarify(response_type="text")` | PASS / FAIL: gọi `social_search(query="ông ấy")` |
+| G05_parallel_wiki_and_news | single | Hai nhu cầu khác loại trong một câu, gọi song song | `wiki(query="Alan Turing")` + `lookup(topic="news", timeframe="day")` | PASS / FAIL: `lookup` thiếu `topic`, `timeframe` |
+| G06_wiki_clarify_then_fill_lang | multi | Tên ở lượt 3, ngôn ngữ ở lượt 4, giữ cả hai | `wiki(query="Marie Curie", lang="en")` | PASS / PASS |
+| G07_send_after_explicit_confirmation | multi | User đã xác nhận nội dung thì gửi với `confirmed=true`, giữ nguyên văn bản | `send(text="RICONs demo lúc 19h", confirmed=true)` | PASS / FAIL: `send` thiếu `confirmed` |
+| G08_correction_search_type_top | multi | User sửa "phổ biến nhất" thành `search_type=Top`, giữ query | `social_search(query="Claude", search_type="Top")` | PASS / PASS |
+| G09_concept_wiki_not_papers | multi | Chỉ cần định nghĩa, từ chối paper → `wiki`, không `papers` | `wiki` | PASS / PASS |
+| G10_research_before_post | multi | "Tra rồi đăng luôn": bước này chỉ tra, chưa được `send` | chỉ `wiki(query="Alan Turing")` | PASS / FAIL: gọi thêm `send` khi chưa có nội dung |
 
 ### B4. Live Chat Evidence
 
@@ -95,11 +107,16 @@ Lấy từ `starter_v0/transcripts/*.transcript.json`.
 
 | Item | Evidence File | What Worked | Risk / Guardrail |
 |---|---|---|---|
-| Tool mới (`tools/<tên>/`) |  |  |  |
-| Unit test tool mới (≥ 3 test/tool) | `pytest` output (0 failed) |  |  |
+| Tool mới `wiki` | [`starter_v0/tools/wiki/`](../../starter_v0/tools/wiki/) (`tool.py`, `TOOL.md`), đăng ký trong [`tools/__init__.py`](../../starter_v0/tools/__init__.py) và cuối [`artifacts/tools.yaml`](../../starter_v0/artifacts/tools.yaml) | Một request MediaWiki (search + intro), không cần API key; `items` cùng dạng với `lookup` nên đưa thẳng vào `format` được; model route đúng tới `wiki` ở G01, G05, G06, G09, G10 | Input xấu (`query` rỗng, `lang` ngoài `vi`/`en`) trả error dict, không gọi mạng; `max_results` kẹp 1-5; tool chỉ đọc, không side effect |
+| Unit test tool mới (≥ 3 test/tool) | [`tests/test_tools_todo.py`](../../starter_v0/tests/test_tools_todo.py), 7 test `test_wiki_*`; `pytest`: 74 passed, 0 failed, 14 skipped (stub tool có sẵn) | Happy path (request + mapping), input xấu (query rỗng, lang ngoài enum, số dạng chuỗi), nhánh lỗi (HTTP 429, timeout) | Test chạy offline qua `fake_http`; mỗi test assert cả request gửi đi lẫn kết quả trả về |
 | UI (lệnh chạy + link dùng thử) |  |  |  |
 
 Tool unit tests: số test đã viết, và một ví dụ lỗi mà unit test bắt được nhưng eval không bắt được.
+
+7 test cho `wiki`.
+Ví dụ lỗi chỉ unit test bắt được: API Wikipedia trả các trang không theo thứ tự xếp hạng (thứ hạng nằm ở field `index`).
+Nếu tool quên sắp xếp, model vẫn gọi đúng `wiki(query="Alan Turing")` nên eval vẫn PASS, nhưng user có thể nhận bài kém liên quan nhất lên đầu.
+Test `test_wiki_sends_one_search_request_and_maps_pages_by_rank` cố ý đưa các trang theo thứ tự ngược để bắt lỗi này.
 
 ### B5. Bonus Evidence
 

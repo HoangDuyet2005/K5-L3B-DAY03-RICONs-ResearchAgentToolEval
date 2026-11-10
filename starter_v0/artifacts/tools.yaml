@@ -123,3 +123,14 @@ tools:
         max_pages: {type: integer, default: 5, description: "Số trang"}
         max_chars: {type: integer, default: 8000, description: "Số ký tự"}
       required: [arxiv_url]
+
+  # ---------------- Team RICONs tools ----------------
+  - name: wiki
+    description: "Tra Wikipedia để lấy kiến thức nền ổn định: định nghĩa khái niệm, tiểu sử người, lịch sử tổ chức/công nghệ. Trả về đoạn mở đầu của bài khớp nhất kèm link. DÙNG khi user hỏi 'X là gì', 'X là ai', 'lịch sử của X'. KHÔNG dùng cho tin tức hay sự kiện mới (dùng lookup với topic=news), bài đăng/tweet (dùng timeline hoặc social_search), hay khi user đã đưa URL cụ thể (dùng fetch)."
+    parameters:
+      type: object
+      properties:
+        query: {type: string, default: "", description: "Tên bài hoặc khái niệm cần tra, ngắn gọn, không kèm từ hỏi (ví dụ 'Alan Turing', không phải 'Alan Turing là ai')."}
+        lang: {type: string, enum: [vi, en], default: "vi", description: "Ngôn ngữ Wikipedia. Mặc định vi; dùng en khi user hỏi bằng tiếng Anh hoặc yêu cầu nguồn tiếng Anh."}
+        max_results: {type: integer, default: 1, description: "Số bài trả về, từ 1 đến 5. Mặc định 1; chỉ tăng khi user muốn so sánh nhiều bài."}
+      required: [query]
