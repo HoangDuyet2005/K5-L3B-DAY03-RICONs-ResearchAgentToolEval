@@ -7,7 +7,7 @@
 - Repo nhóm: `K5-L3B-DAY03-RICONs-ResearchAgentToolEval`
 - URL repo: https://github.com/HoangDuyet2005/K5-L3B-DAY03-RICONs-ResearchAgentToolEval
 - Nhánh nộp: `main`
-- Commit chốt: `35a153f`
+- Commit chốt: `c67543b`
 
 ## Thành viên
 
