@@ -64,7 +64,7 @@ Lấy từ `starter_v0/artifacts/version_log.csv` và `starter_v0/runs/*.json`. 
 |---|---|---|---:|---:|---|
 | v0 | baseline (`system_prompt.md` + `tools.yaml` của starter; model `anthropic/claude-haiku-5.5`) | Đo hành vi chưa tối ưu trước khi sửa | – | case 0.70 · routing 0.85 · args 0.70 · multiturn 0.8333 (14/20 PASS) | `starter_v0/runs/v0_B_base_openrouter_20261110T175934403647.json` |
 | v1 | `system_prompt.md` | Prompt starter ra lệnh đoán account/URL và gửi ngay → agent không `clarify` (R10, R11) và gọi `send` khi chưa xác nhận (R12). Bỏ các chỉ dẫn đó, thêm rule phạm vi / thiếu info → `clarify` / xác nhận trước khi `send`. | case 0.70 · routing 0.85 · args 0.70 | case **0.80** · routing **1.00** · args 0.80 · multiturn 0.8333 (16/20). R10, R11 → PASS. R12 vẫn FAIL nhưng đổi bản chất: không còn gọi `send`, mà `clarify(response_type="text")` hỏi nội dung bản tin thay vì `yes_no` | `starter_v0/runs/v1_B_base_openrouter_20261110T180926543698.json` |
-| v2 |  |  |  |  |  |
+| v2 | `tools.yaml` (chỉ description của param `query` trong `lookup`, `social_search`) | Tool declaration không nói `query` nên chứa gì → model nhồi "tin tức… hôm nay" vào `query` dù đã có `topic`/`timeframe` (R03, R13, M02). Thêm convention: `query` chỉ là từ khóa chủ đề ngắn. | case 0.80 · args 0.80 · multiturn 0.8333 | case **0.95** · routing 1.00 · args **0.95** · multiturn **1.00** (19/20). R03, R13, M02 → PASS; còn R12 | `starter_v0/runs/v2_B_base_openrouter_20261110T181408218976.json` |
 | v3 |  |  |  |  |  |
 
 ### B2. Failure Analysis
