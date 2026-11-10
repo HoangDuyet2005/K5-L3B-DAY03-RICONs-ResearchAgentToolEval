@@ -29,6 +29,7 @@ Model dùng cho mọi run: `anthropic/claude-haiku-5.5` qua OpenRouter (nhóm ch
 | v1 | `system_prompt.md`: bỏ các chỉ dẫn "đoán account / đoán URL / gửi ngay / ép một bước"; thêm rule phạm vi, thiếu info → `clarify`, xác nhận trước khi `send`, gọi song song khi yêu cầu có nhiều phần | Prompt starter ra lệnh đoán và gửi ngay nên agent không `clarify` (R10, R11) và gọi `send` khi chưa xác nhận (R12) | 0.70 → 0.80 (routing 0.85 → 1.00) | `starter_v0/runs/v1_B_base_openrouter_20261110T180926543698.json` |
 | v2 | `tools.yaml`: description param `query` của `lookup` và `social_search` — chỉ là từ khóa chủ đề ngắn, không thêm từ chỉ loại nội dung/thời gian | Declaration không nói `query` nên chứa gì nên model nhồi "tin tức… hôm nay" vào `query` dù đã có `topic`/`timeframe` (R03, R13, M02) | 0.80 → 0.95 (multiturn 0.8333 → 1.00) | `starter_v0/runs/v2_B_base_openrouter_20261110T181408218976.json` |
 | v3 | `tools.yaml`: viết lại description mọi tool theo mẫu "làm gì · DÙNG khi · KHÔNG dùng khi"; `send` chỉ khi `confirmed=true`; `clarify` dùng `yes_no` cho yêu cầu gửi/đăng; convention `screenname`, `limit`, `topic`, `timeframe`, `search_type` | Thiếu boundary `send`/`clarify` trong declaration là lý do R12 hỏi `text` thay vì `yes_no` | 0.95 → 0.95 (không đổi, không regression) | `starter_v0/runs/v3_B_base_openrouter_20261110T182001695249.json` |
+| v5 | `system_prompt.md`: thêm mục "Chọn tool" — rule routing tường minh cho từng tool (`timeline`, `social_search`, `lookup`, `fetch`, `wiki`, `papers`, `policy`, 3 tool bonus, `format`, `clarify`); `tools.yaml` giữ nguyên `v4-tools` | Routing trước đó chỉ nằm trong description của `tools.yaml`; đưa lên prompt sẽ giữ routing 1.00, không regression, nhưng không sửa được R12 (lỗi boundary, không phải routing) | 0.95 → 0.95 (routing 1.00, đúng dự đoán) | `starter_v0/runs/v5_B_base_openrouter_20261110T231634886288.json` |
 
 Nhận xét chính từ failure analysis:
 
@@ -45,6 +46,7 @@ Nhận xét chính từ failure analysis:
   - `1e32f57` — v1: system prompt (0.70 → 0.80)
   - `bf38c61` — v2: query convention (0.80 → 0.95)
   - `e63ad79` — v3: rewrite tool descriptions + send boundary + arg conventions
+  - `c67543b` — v5: explicit tool routing rules in system prompt (0.95 → 0.95, routing 1.00)
 - Run JSON (`provider_error_cases == 0`, `measured_cases == total_cases == 20`): 4 file `starter_v0/runs/v0…v3_B_base_openrouter_*.json` ở bảng trên; mỗi version có `prompt_hash`/`tools_hash` khác version trước (ghi trong `starter_v0/artifacts/version_log.csv`).
 - `pytest tests/test_tool_contract.py`: 55 passed sau mỗi lần sửa `tools.yaml`.
 - AI/công cụ đã dùng và cách tự kiểm tra kết quả: dùng trợ lý AI (Claude Code) để đọc code eval, gợi ý nội dung prompt/description và tóm tắt run JSON. Tự kiểm tra bằng cách: chạy lại eval thật sau mỗi thay đổi và chỉ ghi metric lấy từ `summary` của run JSON; đọc `actual_tool_calls` của từng case FAIL để xác nhận nguyên nhân; chạy `pytest tests/test_tool_contract.py` sau mỗi lần sửa `tools.yaml`; kiểm tra run JSON không chứa API key trước khi commit.

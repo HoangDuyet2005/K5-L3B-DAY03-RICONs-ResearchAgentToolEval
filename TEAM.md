@@ -61,11 +61,12 @@ Mỗi thành viên có báo cáo riêng trong `report/team/` theo dạng `MSSV_H
 - v1 (`system_prompt.md`): bỏ chỉ dẫn đoán/gửi ngay, thêm rule phạm vi / `clarify` / xác nhận trước `send` → 0.70 → 0.80, routing 0.85 → 1.00.
 - v2 (`tools.yaml`, param `query`): `query` chỉ là từ khóa chủ đề ngắn → 0.80 → 0.95, multiturn 0.8333 → 1.00.
 - v3 (`tools.yaml`): viết lại description mọi tool (khi nào dùng / không dùng), boundary `send`, convention args → 0.95 → 0.95, không regression; R12 vẫn FAIL (phân tích ở B1/B6).
+- v5 (`system_prompt.md`): thêm rule routing tường minh cho từng tool → 0.95 → 0.95, routing 1.00, không regression; R12 vẫn FAIL như dự đoán.
 - Sửa lỗi môi trường: pin `pytest<9` vì pytest 9.2.0 lỗi INTERNALERROR trên Python 3.10.
 
 ### Bằng chứng
 
-- Commit trên `main`: `2e1a51b` (pytest), `3b0e51d` (v0), `1e32f57` (v1), `bf38c61` (v2), `e63ad79` (v3).
+- Commit trên `main`: `2e1a51b` (pytest), `3b0e51d` (v0), `1e32f57` (v1), `bf38c61` (v2), `e63ad79` (v3), `c67543b` (v5).
 - Run: `starter_v0/runs/v{0,1,2,3}_B_base_openrouter_*.json`; 4 dòng v0–v3 trong `starter_v0/artifacts/version_log.csv`.
 
 ## Người B - LuuNguyenChiDuc-2A202603923
