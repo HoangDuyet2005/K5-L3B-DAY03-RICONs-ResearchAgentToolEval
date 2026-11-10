@@ -137,9 +137,25 @@ Nhận xét:
 
 Lấy từ `starter_v0/transcripts/*.transcript.json`.
 
+Chat live qua UI Streamlit, model `anthropic/claude-haiku-5.5`, 3 transcript.
+Cả 3 có `artifact_version` `ui+p8f5c6f233078+t1693ac83a810`: nhãn là `ui` nhưng `prompt_hash` và `tools_hash` trùng đúng bản `v3-wiki` trong `version_log.csv`.
+
+- T1 (yêu cầu thường, ngoài phạm vi, tool lỗi): [`ui_streamlit_openrouter_20261110T190837448475.transcript.json`](../../starter_v0/transcripts/ui_streamlit_openrouter_20261110T190837448475.transcript.json)
+- T2 (thiếu thông tin rồi bổ sung): [`ui_streamlit_openrouter_20261110T191950185955.transcript.json`](../../starter_v0/transcripts/ui_streamlit_openrouter_20261110T191950185955.transcript.json)
+- T3 (yêu cầu đăng Telegram, xác nhận rồi gửi thật): [`ui_streamlit_openrouter_20261110T193835828410.transcript.json`](../../starter_v0/transcripts/ui_streamlit_openrouter_20261110T193835828410.transcript.json)
+
 | Turn | User Request | Tool Calls | Version Evidence | Outcome |
 |---|---|---|---|---|
-|  |  |  |  |  |
+| T1-1 | Viết giúp mình một hàm Python tính Fibonacci | không gọi tool | v3-wiki (hash như trên) | Từ chối vì ngoài phạm vi research, gợi ý việc agent làm được (tra Wikipedia, tìm paper). Đúng: không gọi tool cho yêu cầu ngoài phạm vi |
+| T1-2 | Alan Turing là ai? Và hôm nay có tin gì mới về AI không? | `wiki(query="Alan Turing", lang="vi")` + `lookup(query="AI", topic="news", timeframe="day")`, cùng một round | v3-wiki | Yêu cầu research thường: gọi song song tool mới `wiki` (1 bài) và `lookup` (5 tin), trả lời 2 phần, mỗi phần kèm nguồn. `query` của `lookup` gọn ("AI") đúng convention v2 |
+| T1-3 | Tóm tắt 5 tweet mới nhất giúp mình của Elon Musk nhé | `timeline(screenname="elonmusk", limit=5)` | v3-wiki | Map tên thành handle `elonmusk`, giữ `limit=5`; tóm tắt 5 tweet kèm link, tự ghi chú 3/5 là retweet và nội dung bị cắt nên chưa kiểm chứng |
+| T1-4 | Tóm tắt bài này giúp mình: `https://www.anthropic.com/research` | `fetch(url="https://www.anthropic.com/research")` → `RuntimeError: Missing FIRECRAWL_API_KEY` | v3-wiki | Tool lỗi: UI hiện lỗi đỏ và JSON thô; agent nói thẳng là không đọc được trang, không bịa nội dung, đề xuất 3 cách khác |
+| T1-5 | What is the most popular paper since chatGPT blown up? | `papers(query="large language models", max_results=5, sort_by="relevance")` | v3-wiki | Trả lời bằng tiếng Anh theo user; nói rõ kết quả xếp theo độ liên quan, không theo độ phổ biến/citation, nên không trả lời được câu hỏi "phổ biến nhất". Giới hạn: tool `papers` không có tiêu chí citation |
+| T2-1 | Tóm tắt 5 tweet mới nhất giúp mình | `clarify(response_type="text")`: "Bạn muốn tóm tắt 5 tweet mới nhất của tài khoản nào? Cho mình handle X (không cần @)..." | v3-wiki | Thiếu tài khoản: hỏi lại thay vì đoán (prompt starter v0 từng đoán `sama`, xem R10 ở B2) |
+| T2-2 | karpathy | `timeline(screenname="karpathy", limit=5)` | v3-wiki | Bổ sung ở lượt sau: dùng handle user đưa và giữ `limit=5` từ lượt 1; tóm tắt 5 tweet kèm link và số tương tác |
+| T3-1 | Đăng bản tin AI hôm nay lên Telegram giúp mình | `lookup(query="AI", topic="news", timeframe="day", max_results=5)` → `format(template="daily_ai_vn")` → `clarify(response_type="yes_no")` | v3-wiki | Chưa gửi gì: tra tin, soạn bản tin, rồi xin xác nhận yes/no kèm nội dung sẽ gửi |
+| T3-2 | Có | không gọi tool | v3-wiki | Chưa gửi: agent báo 3 chi tiết trong bản tin chưa kiểm chứng được và hỏi user chọn gửi bản chỉ có tiêu đề + link hay bản đầy đủ. Nguyên nhân: lịch sử hội thoại chỉ giữ tiêu đề + link của kết quả `lookup`, không giữ nội dung nguồn (xem mục 5) |
+| T3-3 | 2 (gửi bản đầy đủ) | `send(text=<bản tin đã hiển thị>, confirmed=true)` → `{"status": "sent"}` | v3-wiki | Gửi thật lên private channel của nhóm sau khi user xác nhận; bản tin xuất hiện trong channel kèm link nguồn |
 
 ### B5a. Required Evidence — Tool mới, unit test, UI
 
@@ -164,7 +180,7 @@ Chỉ điền nếu nhóm làm bonus (ghi riêng, tối đa 10 điểm). Tool c�
 |---|---|---|---|
 | Small Local Model | xem B7 |  |  |
 | Hơn 3 tool mới (≥ 4) |  |  |  |
-| `send` gửi thật lên Telegram sau xác nhận | transcript |  |  |
+| `send` gửi thật lên Telegram sau xác nhận | T3 ở B4: [`ui_streamlit_openrouter_20261110T193835828410.transcript.json`](../../starter_v0/transcripts/ui_streamlit_openrouter_20261110T193835828410.transcript.json) | Luồng đầy đủ: agent soạn bản tin rồi `clarify(yes_no)` → user xác nhận → `send(confirmed=true)` → `status: sent` trên private channel của nhóm | Tool `send` tự chặn khi `confirmed` khác `true` (trả `needs_confirmation`, không gọi mạng); token và chat id chỉ nằm trong `.env`, không có trong transcript |
 | Test challenge (0 skipped / regression test) | `pytest` output |  |  |
 
 Test challenge: số bug tìm được trong tool có sẵn (nếu có), cách sửa, và test regression tương ứng.
@@ -199,7 +215,19 @@ Lỗi đặc thù của model nhỏ (đếm từ run JSON):
 
 > Khó khăn chính và cách nhóm xử lý. Nếu gặp lỗi kỹ thuật (provider lỗi, hết quota API, tool không chạy), mô tả lỗi và dẫn bằng chứng: run JSON, log, ảnh chụp.
 
--
+- **Agent không bao giờ gửi được Telegram dù user đã xác nhận (lỗi ngữ cảnh nhiều lượt).**
+  `chat.py` của starter chỉ lưu vào lịch sử text cuối của user và assistant, bỏ hết tool call và kết quả tool.
+  Ở lượt sau, model thấy một bản tin "do chính nó viết" nhưng không thấy lần `lookup` nào, nên kết luận bản tin không có nguồn, không gửi, và tra lại từ đầu; mỗi lần user nói "có" lại lặp lại vòng đó.
+  Bằng chứng: [`ui_streamlit_openrouter_20261110T192055287079.transcript.json`](../../starter_v0/transcripts/ui_streamlit_openrouter_20261110T192055287079.transcript.json), 4 lượt, user xác nhận 3 lần, không lượt nào gọi `send`.
+  Cách xử lý: UI ([`starter_v0/app.py`](../../starter_v0/app.py), hàm `assistant_history_entry`) lưu kèm mỗi lượt assistant một khối `TOOL_EVIDENCE` gọn: tool đã gọi, args, tiêu đề + link của kết quả, bản markdown của `format`, hoặc lỗi.
+  `chat.py` không nằm trong danh sách file được sửa nên giữ nguyên; lỗi vẫn còn khi chat bằng CLI.
+- **Bản sửa đầu nén quá tay.**
+  Khối evidence ban đầu chỉ giữ tiêu đề + link, nên model thấy các chi tiết trong bản tin ("hơn 300 triệu người", Goldman Sachs, AMD) mà không thấy nguồn nào chứa chúng, và dừng lại hỏi user (T3-2 ở B4), dù cả 3 chi tiết đều có trong nội dung kết quả `lookup`.
+  Đã thêm nội dung nguồn của mỗi kết quả (tối đa 1000 ký tự/kết quả) vào evidence; chạy lại kịch bản "đăng bản tin" → "Có" thì agent gọi thẳng `send(confirmed=true)`.
+- **`prompt_hash` lệch dù prompt không đổi.**
+  `versioning.py` hash byte thô của file; trên Windows với `core.autocrlf=true`, git checkout `system_prompt.md` và `tools.yaml` thành CRLF nên hash khác bản LF của người khác trong nhóm, khiến run `v3-wiki` đầu tiên trông như đổi cả prompt lẫn tools.
+  Đã thêm [`.gitattributes`](../../.gitattributes) giữ `starter_v0/artifacts/*.md|*.yaml` ở LF trên mọi máy, xóa các run có hash sai và chạy lại; `v3-wiki` giờ có `prompt_hash` trùng v3 (`8f5c6f233078`), chỉ `tools_hash` đổi do thêm `wiki`.
+- **Thiếu key Firecrawl.** Nhóm chưa có `FIRECRAWL_API_KEY` nên `fetch` trả lỗi; UI hiện lỗi này thay vì che (T1-4 ở B4).
 
 ## 6. Tổng hợp đóng góp
 

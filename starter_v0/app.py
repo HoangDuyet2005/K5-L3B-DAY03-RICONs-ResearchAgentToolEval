@@ -10,6 +10,7 @@ result (including errors) is shown under each answer; nothing is hidden.
 """
 from __future__ import annotations
 
+import json
 import os
 import sys
 from datetime import datetime
@@ -36,6 +37,9 @@ TRANSCRIPTS_DIR = ROOT / "transcripts"
 HISTORY_WINDOW = 5
 MAX_TOOL_ROUNDS = 4
 MAX_TURNS_PER_SESSION = 20  # the link is public; this caps what one visitor can spend
+EVIDENCE_ITEMS = 8
+EVIDENCE_SUMMARY_CHARS = 1000  # claims in a digest can sit ~750 chars into a source snippet
+EVIDENCE_MARKDOWN_CHARS = 3000
 
 SAMPLE_QUESTIONS = [
     "Alan Turing là ai?",
@@ -79,6 +83,47 @@ def new_session(version: str, model: str) -> None:
         "updated_at": now_iso(),
         "turns": [],
     }
+
+
+def summarize_tool_event(event: dict[str, Any]) -> str | None:
+    """One compact line (or block) of evidence for the conversation history."""
+    result = event.get("result") if isinstance(event.get("result"), dict) else {}
+    if result.get("awaiting_user"):
+        return None  # the clarify question is already the assistant's reply
+    args = {key: value for key, value in (event.get("args") or {}).items() if key != "items"}
+    call = f"{event.get('tool')}({json.dumps(args, ensure_ascii=False)[:200]})"
+    if "error" in result:
+        return f"- {call} -> ERROR {result.get('error')}: {result.get('message', '')}"
+    if result.get("markdown"):
+        return f"- {call} -> markdown:\n{result['markdown'][:EVIDENCE_MARKDOWN_CHARS]}"
+    if isinstance(result.get("items"), list):
+        items = result["items"]
+        lines = []
+        for item in items[:EVIDENCE_ITEMS]:
+            if not isinstance(item, dict):
+                continue
+            lines.append(f"  - {item.get('title')} ({item.get('url')})")
+            summary = " ".join(str(item.get("summary") or "").split())
+            if summary:
+                lines.append(f"    source text: {summary[:EVIDENCE_SUMMARY_CHARS]}")
+        return "\n".join([f"- {call} -> {len(items)} item(s):", *lines])
+    return f"- {call} -> {json.dumps(result, ensure_ascii=False, default=str)[:300]}"
+
+
+def assistant_history_entry(assistant_text: str, events: list[dict[str, Any]]) -> str:
+    """The assistant turn as the model will see it on the next turn.
+
+    chat.py keeps only the final text, so on the next turn the model cannot see
+    that its answer came from real tool results; it then distrusts its own
+    digest, re-runs the search and never reaches send(confirmed=true). Keeping
+    a compact record of the tool calls and results fixes that. The record keeps
+    each item's source text as well as its title/url: with titles alone the
+    model could not tell which digest claims the sources supported.
+    """
+    evidence = [line for line in (summarize_tool_event(event) for event in events) if line]
+    if not evidence:
+        return assistant_text
+    return assistant_text + "\n\nTOOL_EVIDENCE (real tool calls and results from this turn):\n" + "\n".join(evidence)
 
 
 def render_tool_events(events: list[dict[str, Any]]) -> None:
@@ -134,7 +179,7 @@ def run_turn(user_text: str, model: str) -> None:
         turn.update(result)
         st.session_state.history += [
             {"role": "user", "content": user_text},
-            {"role": "assistant", "content": result["assistant_text"]},
+            {"role": "assistant", "content": assistant_history_entry(result["assistant_text"], result["tool_events"])},
         ]
     except Exception as exc:  # show provider failures instead of hiding them
         turn.update({"status": "provider_error", "error": f"{type(exc).__name__}: {exc}"})
