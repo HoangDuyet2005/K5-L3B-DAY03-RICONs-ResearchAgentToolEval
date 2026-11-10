@@ -107,6 +107,7 @@ Lấy từ `starter_v0/artifacts/version_log.csv` và `starter_v0/runs/*.json`. 
 | v1 | `system_prompt.md` | Prompt starter ra lệnh đoán account/URL và gửi ngay → agent không `clarify` (R10, R11) và gọi `send` khi chưa xác nhận (R12). Bỏ các chỉ dẫn đó, thêm rule phạm vi / thiếu info → `clarify` / xác nhận trước khi `send`. | case 0.70 · routing 0.85 · args 0.70 | case **0.80** · routing **1.00** · args 0.80 · multiturn 0.8333 (16/20). R10, R11 → PASS. R12 vẫn FAIL nhưng đổi bản chất: không còn gọi `send`, mà `clarify(response_type="text")` hỏi nội dung bản tin thay vì `yes_no` | `starter_v0/runs/v1_B_base_openrouter_20261110T180926543698.json` |
 | v2 | `tools.yaml` (chỉ description của param `query` trong `lookup`, `social_search`) | Tool declaration không nói `query` nên chứa gì → model nhồi "tin tức… hôm nay" vào `query` dù đã có `topic`/`timeframe` (R03, R13, M02). Thêm convention: `query` chỉ là từ khóa chủ đề ngắn. | case 0.80 · args 0.80 · multiturn 0.8333 | case **0.95** · routing 1.00 · args **0.95** · multiturn **1.00** (19/20). R03, R13, M02 → PASS; còn R12 | `starter_v0/runs/v2_B_base_openrouter_20261110T181408218976.json` |
 | v3 | `tools.yaml` (viết lại description mọi tool + convention args) | Description cũ không nói khi nào dùng / không dùng và không có boundary `send`/`clarify` → ở R12 agent hỏi nội dung (`text`) thay vì xin xác nhận (`yes_no`). Viết lại theo mẫu "làm gì · DÙNG khi · KHÔNG dùng khi", `send` chỉ khi `confirmed=true`, yêu cầu gửi/đăng → `clarify(yes_no)`. | case 0.95 · args 0.95 · multiturn 1.00 | case 0.95 · routing 1.00 · args 0.95 · multiturn 1.00 (19/20) — **không đổi**. Không regression ở 19 case còn lại. R12 vẫn `clarify(response_type="text")`: model ưu tiên hỏi nội dung vì "bản tin này" không tồn tại trong hội thoại → giả thuyết bị bác bỏ một phần: thiếu boundary trong declaration không phải nguyên nhân chính | `starter_v0/runs/v3_B_base_openrouter_20261110T182001695249.json` |
+| v5 | `system_prompt.md` (thêm mục "Chọn tool"; `tools.yaml` giữ nguyên `v4-tools`) | Rule routing trước đó chỉ nằm trong description của `tools.yaml` (v3); prompt chỉ có rule cho `clarify`. Đưa rule routing tường minh cho từng tool (`timeline` / `social_search` / `lookup` / `fetch` / `wiki` / `papers` / `policy` / 3 tool bonus / `format` / `clarify`) lên prompt sẽ giữ routing 1.00 và không regression; dự đoán không sửa được R12 vì đó là lỗi boundary, không phải routing | case 0.95 · routing 1.00 · args 0.95 · multiturn 1.00 (`v4-tools`) | case 0.95 · routing 1.00 · args 0.95 · multiturn 1.00 (19/20) — **không đổi**, đúng dự đoán. Case FAIL duy nhất vẫn là R12 (`clarify(response_type="text")`) | `starter_v0/runs/v5_B_base_openrouter_20261110T231634886288.json` |
 
 ### B2. Failure Analysis
 
@@ -284,14 +285,14 @@ Ranh giới giữa tool mới và tool sẵn có (`wiki` / `lookup` / `papers`, 
 
 **Failure nào cần review thủ công thay vì chấm tự động?**
 
-- R12 (`confirm_before_send`): từ v1 đến v4-tools, agent hỏi nội dung bản tin (`clarify(text)`) thay vì xin xác nhận (`yes_no`). Vì user chưa đưa bản tin nào, hỏi nội dung là hành vi an toàn và có thể hợp lý hơn đáp án; chấm tự động vẫn tính FAIL.
+- R12 (`confirm_before_send`): từ v1 đến v5, agent hỏi nội dung bản tin (`clarify(text)`) thay vì xin xác nhận (`yes_no`). Vì user chưa đưa bản tin nào, hỏi nội dung là hành vi an toàn và có thể hợp lý hơn đáp án; chấm tự động vẫn tính FAIL.
 - R03 / R13: eval gán `wrong_tool` nhưng tool đúng, chỉ `query` dài dòng (B2). Phải đọc `actual_tool_calls` mới thấy.
 - Chất lượng câu trả lời cuối: eval chỉ chấm tool call, không chấm agent có bịa nội dung không. Ví dụ T1-4 (`fetch` lỗi, agent không bịa) và T1-5 (agent nói rõ `papers` không xếp theo độ phổ biến) chỉ kiểm được bằng đọc transcript.
 - Lỗi nhiều lượt có side effect: lỗi lịch sử hội thoại làm agent không bao giờ `send` (mục 5) không lộ ra trong eval, vì eval đưa sẵn lịch sử; chỉ chat live mới thấy.
 
 **Nếu có thêm một vòng, nhóm sẽ thử giả thuyết nào?**
 
-- v5 (prompt): thêm rule "yêu cầu gửi/đăng mà chưa có nội dung → tra/soạn trước, rồi `clarify(yes_no)` kèm nội dung; không gọi `send` cùng lượt với tool tra cứu". Đo trên R12 và G10 (G10 FAIL trên `gpt-4.1-nano` ở cả v0 lẫn v3).
+- v6 (prompt): thêm rule "yêu cầu gửi/đăng mà chưa có nội dung → tra/soạn trước, rồi `clarify(yes_no)` kèm nội dung; không gọi `send` cùng lượt với tool tra cứu". Đo trên R12 và G10 (G10 FAIL trên `gpt-4.1-nano` ở cả v0 lẫn v3).
 - Tách v3 thành hai version (description "dùng / không dùng" và convention args) để biết phần nào sửa G07 trên nano và phần nào làm G03 FAIL.
 - Chạy base eval trên `gpt-4.1-nano` để kiểm tra prompt tối ưu trên Haiku có chuyển sang model yếu hơn không (B3 cho thấy là chưa).
 
